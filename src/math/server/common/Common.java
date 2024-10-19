@@ -1,5 +1,8 @@
 package math.server.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -8,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Common {
+
+    private static final Logger log = LoggerFactory.getLogger(Common.class);
 
     public static <T> void objectMapper(ResultSet resultSet, T object) throws SQLException {
         Field[] fields = object.getClass().getDeclaredFields();
@@ -29,7 +34,7 @@ public class Common {
                 try {
                     field.set(object, value);
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException("Failed to set value for field: " + field.getName(), e);
+                    log.error("Failed to set value for field: " + field.getName(), e);
                 }
             }
         }

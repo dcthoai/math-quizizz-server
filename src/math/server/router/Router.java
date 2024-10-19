@@ -60,10 +60,10 @@ public class Router {
             } catch (Exception e) {
                 e.printStackTrace();
 
-                return new BaseResponse<>(500, e.getMessage());
+                return new BaseResponse<>(500, false, e.getMessage());
             }
         }
 
-        return new BaseResponse<>(400, "Not found method to handle this request");
+        return new BaseResponse<>(400, false, "Not found method to handle this request");
     }
 }

@@ -3,18 +3,21 @@ package math.server.repository.impl;
 import math.server.common.Common;
 import math.server.model.User;
 import math.server.repository.IUserRepository;
+import math.server.repository.utils.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
-public class UserRepository extends DatabaseConnection implements IUserRepository {
+public class UserRepository implements IUserRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(UserRepository.class);
     private final Connection connection;
 
     public UserRepository() {
-        this.connection = connect();
+        this.connection = new DatabaseConnection().getConnection();
     }
 
     @Override
@@ -34,7 +37,7 @@ public class UserRepository extends DatabaseConnection implements IUserRepositor
                 return user;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to find user by ID: {}", id);
         }
 
         return null;
@@ -57,7 +60,7 @@ public class UserRepository extends DatabaseConnection implements IUserRepositor
                 return user;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to find user by username: {}", username);
         }
 
         return null;

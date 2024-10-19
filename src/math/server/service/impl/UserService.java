@@ -44,9 +44,4 @@ public class UserService implements IUserService {
 
         return false;
     }
-
-    @Override
-    public boolean logout(User user) {
-        return false;
-    }
 }
