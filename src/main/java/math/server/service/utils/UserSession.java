@@ -1,4 +1,4 @@
-package main.java.math.server.service.utils;
+package math.server.service.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

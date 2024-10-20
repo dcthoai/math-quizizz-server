@@ -1,4 +1,4 @@
-package main.java.math.server.model;
+package math.server.model;
 
 /**
  *

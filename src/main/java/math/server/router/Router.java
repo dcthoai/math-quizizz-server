@@ -1,7 +1,8 @@
-package main.java.math.server.router;
+package math.server.router;
 
-import main.java.math.server.common.Constants;
-import main.java.math.server.dto.response.BaseResponse;
+import math.server.common.Constants;
+import math.server.dto.response.BaseResponse;
+import math.server.service.utils.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class Router {
                 log.warn("No method found to register");
             }
         } catch (Exception e) {
-            log.error("Router initialization failed. " + e.getMessage());
+            log.error("Router initialization failed", e);
         }
     }
 
@@ -67,15 +68,15 @@ public class Router {
         }
     }
 
-    public Object handleRequest(String endpoint, String request) {
+    public Object handleRequest(UserSession session,  String endpoint, String request) {
         Method method = routeMap.get(endpoint);
 
         if (Objects.nonNull(method)) {
             try {
                 Object controllerInstance = method.getDeclaringClass().getDeclaredConstructor().newInstance();
-                return method.invoke(controllerInstance, request);
+                return method.invoke(controllerInstance, session, request);
             } catch (Exception e) {
-                log.error("Failed to handle request: " + e.getMessage());
+                log.error("Failed to handle request", e);
                 return new BaseResponse<>(500, false, e.getMessage());
             }
         } else {

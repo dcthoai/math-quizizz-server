@@ -1,12 +1,13 @@
-package main.java.math.server.controller;
+package math.server.controller;
 
 import com.google.gson.Gson;
-import main.java.math.server.common.Constants;
-import main.java.math.server.dto.request.BaseRequest;
-import main.java.math.server.dto.response.BaseResponse;
-import main.java.math.server.model.Room;
-import main.java.math.server.router.Router;
-import main.java.math.server.service.utils.SessionManager;
+import math.server.common.Constants;
+import math.server.dto.request.BaseRequest;
+import math.server.dto.response.BaseResponse;
+import math.server.model.Room;
+import math.server.router.Router;
+import math.server.service.utils.SessionManager;
+import math.server.service.utils.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +24,11 @@ import java.util.UUID;
 public class ClientHandler implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(ClientHandler.class);
-    private final Router router;
     private final SessionManager sessionManager;
-    private final Socket socket;
+    private final UserSession session;
     private final String clientID;
+    private final Router router;
+    private final Socket socket;
     private BufferedReader requestReader;
     private PrintWriter responseWriter;
 
@@ -35,6 +37,7 @@ public class ClientHandler implements Runnable {
         this.router = router;
         this.sessionManager = sessionManager;
         this.clientID = UUID.randomUUID().toString();
+        this.session = sessionManager.getSession(clientID, true);
         log.info("Initialize new socket connection successfully. Running for client: {}", clientID);
 
         try {
@@ -42,7 +45,7 @@ public class ClientHandler implements Runnable {
             this.responseWriter = new PrintWriter(socket.getOutputStream(), true);  // Auto flush data
             log.info("Initialize socket connection IO stream successfully");
         } catch (IOException e) {
-            log.error("Failed to init IO stream for socket {}: ", socket.getInetAddress(), e);
+            log.error("Failed to init IO stream for socket {}", socket.getInetAddress(), e);
         }
     }
 
@@ -69,18 +72,18 @@ public class ClientHandler implements Runnable {
                 if (request.getEndPoint().equals(Constants.SOCKET_CLOSE))
                     return;
 
-                BaseResponse<?> response = (BaseResponse<?>) router.handleRequest(request.getEndPoint(), request.getRequest());
+                BaseResponse<?> response = (BaseResponse<?>) router.handleRequest(session, request.getEndPoint(), request.getRequest());
                 responseWriter.println(gson.toJson(response));
             } catch (SocketException e) {
-                log.warn("Socket connection error. Client might be disconnected: ", e);
+                log.error("Socket connection error. Client might be disconnected", e);
                 closeConnection();
                 return;
             } catch (IOException e) {
-                log.error("IO error occurred while reading request: ", e);
+                log.error("IO error occurred while reading request", e);
                 closeConnection();
                 return;
             } catch (Exception e) {
-                log.error("Failed to execute request from client: ", e);
+                log.error("Failed to execute request from client", e);
                 BaseResponse<?> response = new BaseResponse<>(500, false);
                 responseWriter.println(gson.toJson(response));
             }
@@ -89,6 +92,10 @@ public class ClientHandler implements Runnable {
 
     public String getClientID() {
         return clientID;
+    }
+
+    public UserSession getSession() {
+        return session;
     }
 
     public void sendMessage(String message) {
@@ -112,6 +119,7 @@ public class ClientHandler implements Runnable {
 
     public void closeConnection() {
         log.info("Close socket connection {}...", socket.getInetAddress());
+        sessionManager.invalidSession(clientID);
 
         try {
             socket.close();

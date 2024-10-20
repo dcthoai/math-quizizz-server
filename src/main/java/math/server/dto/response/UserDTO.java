@@ -1,4 +1,4 @@
-package main.java.math.server.dto.response;
+package math.server.dto.response;
 
 public class UserDTO {
 

@@ -1,9 +1,9 @@
-package main.java.math.server.service.impl;
+package math.server.service.impl;
 
-import main.java.math.server.dto.request.UserRequest;
-import main.java.math.server.model.User;
-import main.java.math.server.repository.impl.UserRepository;
-import main.java.math.server.service.IUserService;
+import math.server.dto.request.UserRequest;
+import math.server.model.User;
+import math.server.repository.impl.UserRepository;
+import math.server.service.IUserService;
 
 import java.util.Objects;
 
@@ -13,6 +13,11 @@ public class UserService implements IUserService {
 
     public UserService() {
         this.userRepository = new UserRepository();
+    }
+
+    @Override
+    public Integer save(UserRequest user) {
+        return userRepository.insert("user", new User(user.getUsername(), user.getPassword()));
     }
 
     @Override

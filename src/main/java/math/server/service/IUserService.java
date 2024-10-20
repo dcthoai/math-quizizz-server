@@ -1,9 +1,11 @@
-package main.java.math.server.service;
+package math.server.service;
 
-import main.java.math.server.dto.request.UserRequest;
-import main.java.math.server.model.User;
+import math.server.dto.request.UserRequest;
+import math.server.model.User;
 
 public interface IUserService {
+
+    Integer save(UserRequest user);
 
     User findUserById(int id);
 

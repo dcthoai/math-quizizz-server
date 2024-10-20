@@ -1,16 +1,20 @@
-package main.java.math.server.common;
+package math.server.common;
 
 public interface Constants {
 
     String DATABASE_HOST = "jdbc:mysql://localhost:3306/math?useSSL=true&requireSSL=false";
     String DATABASE_USER = "admin-math";
     String DATABASE_KEY = "1234";
-    Long CONNECTION_TIMEOUT = 6000L; // 60 seconds
-    Long CONNECTION_LIFETIME = 600000L; // 10 minutes
-    String CONTROLLER_PACKAGE = "main.java.math.server.controller";
-    Integer SERVER_PORT = 8888;
 
+    Integer MAX_CONNECTION = 10;
+    Integer MIN_CONNECTION_IDLE = 2;
+    Long CONNECTION_IDLE_TIMEOUT = 10 * 60 * 1000L; // 10 minutes
+    Long CONNECTION_TIMEOUT = 2 * 60 * 1000L; // 2 minutes
+    Long CONNECTION_LIFETIME = 20 * 60 * 1000L; // 20 minutes
+
+    String CONTROLLER_PACKAGE = "math.server.controller";
     String SOCKET_CLOSE = "EXIT";
+    Integer SERVER_PORT = 8888;
 
     String ANSI_RESET = "\u001B[0m";
     String ANSI_RED = "\u001B[31m";

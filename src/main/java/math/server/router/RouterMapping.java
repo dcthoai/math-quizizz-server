@@ -1,4 +1,4 @@
-package main.java.math.server.router;
+package math.server.router;
 
 /**
  * @author thoaidc

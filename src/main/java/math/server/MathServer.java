@@ -1,9 +1,9 @@
-package main.java.math.server;
+package math.server;
 
-import main.java.math.server.common.Constants;
-import main.java.math.server.controller.ClientHandler;
-import main.java.math.server.router.Router;
-import main.java.math.server.service.utils.SessionManager;
+import math.server.common.Constants;
+import math.server.controller.ClientHandler;
+import math.server.router.Router;
+import math.server.service.utils.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public class MathServer {
                 pool.execute(new ClientHandler(socket, router, sessionManager));  // Create new Thread to execute this client request.
             } while (true);
         } catch (IOException e) {
-            log.error("Failed to accept client socket connect: " + e.getMessage());
+            log.error("Failed to accept client socket connect", e);
         }
     }
 

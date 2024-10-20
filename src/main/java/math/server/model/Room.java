@@ -1,6 +1,6 @@
-package main.java.math.server.model;
+package math.server.model;
 
-import main.java.math.server.controller.ClientHandler;
+import math.server.controller.ClientHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,8 +1,8 @@
-package main.java.math.server.config;
+package math.server.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import main.java.math.server.common.Constants;
+import math.server.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,11 +21,11 @@ public class DataSourceProvider {
         config.setUsername(Constants.DATABASE_USER);
         config.setPassword(Constants.DATABASE_KEY);
 
-        config.setMaximumPoolSize(10); // Maximum number of connections
-        config.setMinimumIdle(2); // Minimum number of connections
-        config.setIdleTimeout(10000); // Maximum time a connection is idle
-        config.setMaxLifetime(600000); // Maximum time of a connection
-        config.setConnectionTimeout(10000); // Time to wait for a connection
+        config.setMaximumPoolSize(Constants.MAX_CONNECTION); // Maximum number of connections
+        config.setMinimumIdle(Constants.MIN_CONNECTION_IDLE); // Minimum number of connections
+        config.setIdleTimeout(Constants.CONNECTION_IDLE_TIMEOUT); // Maximum time a connection is idle
+        config.setMaxLifetime(Constants.CONNECTION_LIFETIME); // Maximum time of a connection
+        config.setConnectionTimeout(Constants.CONNECTION_TIMEOUT); // Time to wait for a connection
 
         dataSource = new HikariDataSource(config);
         log.info("Configuration data source for application successfully");
@@ -39,7 +39,7 @@ public class DataSourceProvider {
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
-            log.error("Failed to get connection: ", e);
+            log.error("Failed to get connection", e);
             return null;
         }
     }

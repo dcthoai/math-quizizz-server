@@ -1,4 +1,4 @@
-package main.java.math.server.router;
+package math.server.router;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

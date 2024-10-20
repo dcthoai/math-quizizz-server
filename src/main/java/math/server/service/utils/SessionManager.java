@@ -1,13 +1,13 @@
-package main.java.math.server.service.utils;
+package math.server.service.utils;
 
-import main.java.math.server.model.Room;
+import math.server.model.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.HashMap;
 import java.util.UUID;
+import java.util.Objects;
 
 public class SessionManager {
 
@@ -51,6 +51,13 @@ public class SessionManager {
         }
     }
 
+    public UserSession getSession(String username) {
+        return sessions.values().stream()
+                .filter(session -> session.getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
+    }
+
     public UserSession getSession(String userID, Boolean createSession) {
         if (sessions.containsKey(userID))
             return sessions.get(userID);    // If user has a session
@@ -66,5 +73,6 @@ public class SessionManager {
 
     public void invalidSession(String userId) {
         sessions.remove(userId);
+        log.info("Invalid session for client: {}", userId);
     }
 }

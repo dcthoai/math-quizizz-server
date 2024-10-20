@@ -1,9 +1,9 @@
-package main.java.math.server.repository.impl;
+package math.server.repository.impl;
 
-import main.java.math.server.common.Common;
-import main.java.math.server.model.User;
-import main.java.math.server.repository.IUserRepository;
-import main.java.math.server.repository.utils.BaseRepository;
+import math.server.common.Common;
+import math.server.model.User;
+import math.server.repository.IUserRepository;
+import math.server.repository.utils.BaseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ public class UserRepository extends BaseRepository implements IUserRepository {
                 return user;
             }
         } catch (Exception e) {
-            log.error("Failed to find user by username: {}", username);
+            log.error("Failed to find user by username: {}", username, e);
         }
 
         return null;

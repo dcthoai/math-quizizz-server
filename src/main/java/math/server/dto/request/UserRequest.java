@@ -1,4 +1,4 @@
-package main.java.math.server.dto.request;
+package math.server.dto.request;
 
 public class UserRequest {
 

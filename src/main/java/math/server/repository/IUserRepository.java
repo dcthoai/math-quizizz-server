@@ -1,6 +1,6 @@
-package main.java.math.server.repository;
+package math.server.repository;
 
-import main.java.math.server.model.User;
+import math.server.model.User;
 
 public interface IUserRepository {
 

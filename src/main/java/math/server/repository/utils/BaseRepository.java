@@ -1,11 +1,12 @@
-package main.java.math.server.repository.utils;
+package math.server.repository.utils;
 
-import main.java.math.server.common.Common;
-import main.java.math.server.config.DataSourceProvider;
+import math.server.common.Common;
+import math.server.config.DataSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class BaseRepository {
 
             return query.executeQuery();
         } catch (SQLException e) {
-            log.error("Failed to query data: ", e);
+            log.error("Failed to query data", e);
         }
 
         return null;
@@ -61,7 +62,7 @@ public class BaseRepository {
     public Integer insert(String tableName, Object object) {
         try {
             Map<String, Object> objectFields = Common.getObjectFields(object);
-            List<Object> params = (List<Object>) objectFields.values();
+            List<Object> params = new ArrayList<>(objectFields.values());
             StringBuilder columns = new StringBuilder();
             StringBuilder values = new StringBuilder();
             StringBuilder sql = new StringBuilder("INSERT INTO " + tableName);
@@ -95,16 +96,16 @@ public class BaseRepository {
                     log.error("Inserting data failed, no ID obtained");
             }
         } catch (IllegalAccessException e) {
-            log.error("Failed to get params from object: ", e);
+            log.error("Failed to get params from object", e);
         } catch (SQLException e) {
-            log.error("Failed to insert data into table {}: ", tableName, e);
+            log.error("Failed to insert data into table {}", tableName, e);
         }
 
         return 0;
     }
 
     public boolean update(String tableName, String conditions, Map<String, Object> columnsData) {
-        List<Object> params = (List<Object>) columnsData.values();
+        List<Object> params = new ArrayList<>(columnsData.values());
         StringBuilder columns = new StringBuilder();
         StringBuilder sql = new StringBuilder("UPDATE " + tableName + "SET ");
 
@@ -122,7 +123,7 @@ public class BaseRepository {
 
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
-            log.error("Failed to update this object: ", e);
+            log.error("Failed to update this object", e);
         }
 
         return false;
@@ -138,7 +139,7 @@ public class BaseRepository {
 
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
-            log.error("Delete by ID failed: ", e);
+            log.error("Delete by ID failed", e);
             return false;
         }
     }
@@ -153,7 +154,7 @@ public class BaseRepository {
 
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
-            log.error("Delete by conditions failed: ", e);
+            log.error("Delete by conditions failed", e);
             return false;
         }
     }
