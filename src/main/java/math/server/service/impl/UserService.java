@@ -1,5 +1,6 @@
 package main.java.math.server.service.impl;
 
+import main.java.math.server.dto.request.UserRequest;
 import main.java.math.server.model.User;
 import main.java.math.server.repository.impl.UserRepository;
 import main.java.math.server.service.IUserService;
@@ -16,7 +17,7 @@ public class UserService implements IUserService {
 
     @Override
     public User findUserById(int id) {
-        return userRepository.findUserById(id);
+        return (User) userRepository.findOne(id, User.class);
     }
 
     @Override
@@ -25,23 +26,13 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public boolean checkLogin(User user) {
+    public boolean checkLogin(UserRequest user) {
         User account = null;
 
         if (Objects.nonNull(user.getUsername())) {
             account = userRepository.findUserByUsername(user.getUsername());
-        } else if (Objects.nonNull(user.getId())) {
-            account = userRepository.findUserById(user.getId());
         }
 
-        if (Objects.nonNull(account)) {
-            if (Objects.equals(user.getPassword(), account.getPassword())) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        return false;
+        return Objects.nonNull(account) && Objects.equals(user.getPassword(), account.getPassword());
     }
 }

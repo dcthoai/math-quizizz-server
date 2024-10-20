@@ -19,7 +19,7 @@ public class SessionManager {
     private SessionManager() {
         this.sessions = new HashMap<>();
         this.rooms = new HashMap<>();
-        log.info("Initialized session manager successfully.");
+        log.info("Initialize session manager successfully");
     }
 
     public static SessionManager getInstance() {

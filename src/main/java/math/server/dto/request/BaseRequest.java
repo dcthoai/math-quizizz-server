@@ -2,7 +2,8 @@ package main.java.math.server.dto.request;
 
 public class BaseRequest {
 
-    private String endPoint, request;
+    private String endPoint;
+    private String request;
 
     public BaseRequest() {}
 

@@ -39,4 +39,20 @@ public class Common {
             }
         }
     }
+
+    public static Map<String, Object> getObjectFields(Object object) throws IllegalAccessException {
+        Field[] fields = object.getClass().getDeclaredFields();
+        Map<String, Object> objectMap = new HashMap<>();
+
+        for (Field field : fields) {
+            field.setAccessible(true);  // Allow access to private fields
+
+            String fieldName = field.getName();
+            Object value = field.get(object);
+
+            objectMap.put(fieldName, value);
+        }
+
+        return objectMap;
+    }
 }

@@ -27,17 +27,19 @@ public class UserController implements RouterMapping {
 
     @EndPoint(value = "/login")
     public BaseResponse<?> login(String jsonRequest) {
+        log.debug("Socket request to login. EndPoint: /user/login");
+
         if (Objects.nonNull(jsonRequest)) {
             try {
                 Gson gson = new Gson();
                 UserRequest userRequest = gson.fromJson(jsonRequest, UserRequest.class);
-                User user = new User(userRequest.getUsername(), userRequest.getPassword());
-                boolean isSuccess = userService.checkLogin(user);
+                boolean isSuccess = userService.checkLogin(userRequest);
 
                 if (isSuccess) {
                     UserSession session = SessionManager.getInstance().getSession();    // Create new session for this user
-                    session.setUsername(user.getUsername());
+                    session.setUsername(userRequest.getUsername());
                     session.setLoginState(true);
+                    log.info("Login success. Saved user login status information to session");
 
                     return new BaseResponse<>(200, true, "/login", "Login successfully!", session.getUserID());
                 }
@@ -49,7 +51,7 @@ public class UserController implements RouterMapping {
             }
         }
 
-        return new BaseResponse<>(400, false,"Missing data from request!");
+        return new BaseResponse<>(400, false,"/login", "Missing data from request!");
     }
 
     @EndPoint(value = "/logout")

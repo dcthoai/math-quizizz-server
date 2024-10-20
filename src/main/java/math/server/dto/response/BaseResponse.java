@@ -18,6 +18,11 @@ public class BaseResponse<T> {
         this.result = result;
     }
 
+    public BaseResponse(Integer code, Boolean status) {
+        this.code = code;
+        this.status = status;
+    }
+
     public BaseResponse(Integer code, Boolean status, String action) {
         this.code = code;
         this.status = status;
