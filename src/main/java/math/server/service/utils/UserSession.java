@@ -1,5 +1,7 @@
 package math.server.service.utils;
 
+import math.server.controller.ClientHandler;
+import math.server.model.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,9 +9,11 @@ public class UserSession {
 
     private static final Logger log = LoggerFactory.getLogger(UserSession.class);
     private final String userID;
+    private ClientHandler clientHandler;
     private String username;
     private Boolean loginState;
-    private Integer currentPoint, currentRoom;
+    private Integer currentPoint;
+    private Room currentRoom;
 
     public UserSession(String userID) {
         this.userID = userID;
@@ -44,11 +48,19 @@ public class UserSession {
         this.currentPoint = currentPoint;
     }
 
-    public Integer getCurrentRoom() {
+    public Room getCurrentRoom() {
         return currentRoom;
     }
 
-    public void setCurrentRoom(Integer currentRoom) {
+    public void setCurrentRoom(Room currentRoom) {
         this.currentRoom = currentRoom;
+    }
+
+    public ClientHandler getClientHandler() {
+        return clientHandler;
+    }
+
+    public void setClientHandler(ClientHandler clientHandler) {
+        this.clientHandler = clientHandler;
     }
 }

@@ -1,6 +1,8 @@
 package math.server.controller;
 
 import com.google.gson.Gson;
+import math.server.common.Constants;
+import math.server.dto.request.BaseRequest;
 import math.server.dto.request.UserRequest;
 import math.server.dto.response.BaseResponse;
 import math.server.model.User;
@@ -26,70 +28,61 @@ public class UserController implements RouterMapping {
     }
 
     @EndPoint("/register")
-    public BaseResponse<?> register(UserSession session, String jsonRequest) {
+    public BaseResponse<?> register(UserSession session, BaseRequest request) {
         log.debug("Socket request to register new account. EndPoint: /api/user/login");
 
-        if (Objects.nonNull(jsonRequest)) {
-            try {
-                Gson gson = new Gson();
-                UserRequest userRequest = gson.fromJson(jsonRequest, UserRequest.class);
-                User user = userService.findUserByUsername(userRequest.getUsername());
+        try {
+            Gson gson = new Gson();
+            UserRequest userRequest = gson.fromJson(request.getRequest(), UserRequest.class);
+            User user = userService.findUserByUsername(userRequest.getUsername());
 
-                if (Objects.nonNull(user))
-                    return new BaseResponse<>(400, false, "/login", "Account is exists");
+            if (Objects.nonNull(user))
+                return new BaseResponse<>(Constants.BAD_REQUEST, false, request.getAction(), "Account is exists");
 
-                Integer userID = userService.save(userRequest);
+            Integer userID = userService.save(userRequest);
 
-                if (Objects.nonNull(userID) && userID > 0) {
-                    return new BaseResponse<>(200, true, "/login", "Register successfully!", session.getUserID());
-                }
-
-                return new BaseResponse<>(200, false, "/login", "Login failed! Invalid username or password.");
-            } catch (Exception e) {
-                log.error("Failed to register new account", e);
-                return new BaseResponse<>(500, false, "/login", "Register failed!");
+            if (Objects.nonNull(userID) && userID > 0) {
+                return new BaseResponse<>(Constants.SUCCESS, true, request.getAction(), "Register successfully!", session.getUserID());
             }
-        }
 
-        return new BaseResponse<>(400, false,"/login", "Missing data from request!");
+            return new BaseResponse<>(Constants.SUCCESS, false, request.getAction(), "Login failed! Invalid username or password.");
+        } catch (Exception e) {
+            log.error("Failed to register new account", e);
+            return new BaseResponse<>(Constants.INTERNAL_SERVER_ERROR, false, request.getAction(), "Register failed!");
+        }
     }
 
     @EndPoint(value = "/login")
-    public BaseResponse<?> login(UserSession session, String jsonRequest) {
+    public BaseResponse<?> login(UserSession session, BaseRequest request) {
         log.debug("Socket request to login. EndPoint: /api/user/login");
 
-        if (Objects.nonNull(jsonRequest)) {
-            try {
-                Gson gson = new Gson();
-                UserRequest userRequest = gson.fromJson(jsonRequest, UserRequest.class);
-                boolean isSuccess = userService.checkLogin(userRequest);
+        try {
+            Gson gson = new Gson();
+            UserRequest userRequest = gson.fromJson(request.getRequest(), UserRequest.class);
+            boolean isSuccess = userService.checkLogin(userRequest);
 
-                if (isSuccess) {
-                    session.setUsername(userRequest.getUsername());
-                    session.setLoginState(true);
-                    log.info("Login success. Saved user login status information to session");
+            if (isSuccess) {
+                session.setUsername(userRequest.getUsername());
+                session.setLoginState(true);
+                log.info("Login success. Saved user login status information to session");
 
-                    return new BaseResponse<>(200, true, "/login", "Login successfully!", session.getUserID());
-                }
-
-                return new BaseResponse<>(200, false, "/login", "Login failed! Invalid username or password.");
-            } catch (Exception e) {
-                log.error("Failed to check login", e);
-                return new BaseResponse<>(500, false, "/login", "Failed to check login info.");
+                return new BaseResponse<>(Constants.SUCCESS, true, request.getAction(), "Login successfully!", session.getUserID());
             }
-        }
 
-        return new BaseResponse<>(400, false,"/login", "Missing data from request!");
+            return new BaseResponse<>(Constants.SUCCESS, false, request.getAction(), "Login failed! Invalid username or password.");
+        } catch (Exception e) {
+            log.error("Failed to check login", e);
+            return new BaseResponse<>(Constants.INTERNAL_SERVER_ERROR, false, request.getAction(), "Failed to check login info.");
+        }
     }
 
     @EndPoint(value = "/logout")
-    public BaseResponse<?> logout(UserSession session) {
+    public BaseResponse<?> logout(UserSession session, BaseRequest request) {
         if (Objects.nonNull(session)) {
             SessionManager.getInstance().invalidSession(session.getUserID());
-
-            return new BaseResponse<>(200, true, "/logout", "Logout successfully!");
+            return new BaseResponse<>(Constants.SUCCESS, true, request.getAction(), "Logout successfully!");
         }
 
-        return new BaseResponse<>(400, false, "/logout", "Logout failed!");
+        return new BaseResponse<>(Constants.BAD_REQUEST, false, request.getAction(), "Logout failed! Not found session");
     }
 }

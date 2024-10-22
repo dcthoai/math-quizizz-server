@@ -28,7 +28,10 @@ public class BaseRepository {
                 query.setObject(i + 1, params.get(i));  // JDBC index start with 1
             }
 
-            return query.executeQuery();
+            ResultSet resultSet = query.executeQuery();
+//            query.close();
+
+            return resultSet;
         } catch (SQLException e) {
             log.error("Failed to query data", e);
         }
@@ -46,9 +49,11 @@ public class BaseRepository {
             log.info("Execute query: " + sql);
 
             ResultSet resultSet = query.executeQuery();
+//            query.close();
 
             if (resultSet.next()) {
                 Common.objectMapper(resultSet, object);
+//                resultSet.close();
 
                 return object;
             }
@@ -84,15 +89,19 @@ public class BaseRepository {
             }
 
             int affectedRows = statement.executeUpdate();
+//            statement.close();
 
             if (affectedRows == 0) {
                 log.error("Inserting data failed, no rows affected");
             } else {
                 ResultSet generatedKeys = statement.getGeneratedKeys();
 
-                if (generatedKeys.next())
-                    return generatedKeys.getInt(1); // Return ID of new record which is insert in database
-                else
+                if (generatedKeys.next()) {
+                    int recordID = generatedKeys.getInt(1); // Return ID of new record which is insert in database
+//                    generatedKeys.close();
+
+                    return recordID;
+                } else
                     log.error("Inserting data failed, no ID obtained");
             }
         } catch (IllegalAccessException e) {
@@ -121,7 +130,10 @@ public class BaseRepository {
                 preparedStatement.setObject(i + 1, params.get(i)); // JDBC index start with 1
             }
 
-            return preparedStatement.executeUpdate() > 0;
+            int affectedRows = preparedStatement.executeUpdate();
+//            preparedStatement.close();
+
+            return affectedRows > 0;
         } catch (SQLException e) {
             log.error("Failed to update this object", e);
         }
@@ -137,7 +149,10 @@ public class BaseRepository {
             preparedStatement.setInt(1, ID);
             log.info("Execute query: " + sql);
 
-            return preparedStatement.executeUpdate() > 0;
+            int affectedRows = preparedStatement.executeUpdate();
+//            preparedStatement.close();
+
+            return affectedRows > 0;
         } catch (SQLException e) {
             log.error("Delete by ID failed", e);
             return false;
@@ -152,7 +167,10 @@ public class BaseRepository {
             preparedStatement.setObject(1, conditions);
             log.info("Execute query: " + sql);
 
-            return preparedStatement.executeUpdate() > 0;
+            int affectedRows = preparedStatement.executeUpdate();
+//            preparedStatement.close();
+
+            return affectedRows > 0;
         } catch (SQLException e) {
             log.error("Delete by conditions failed", e);
             return false;

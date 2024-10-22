@@ -24,6 +24,7 @@ public class UserRepository extends BaseRepository implements IUserRepository {
             if (resultSet.next()) {
                 User user = new User();
                 Common.objectMapper(resultSet, user);
+//                resultSet.close();
 
                 return user;
             }

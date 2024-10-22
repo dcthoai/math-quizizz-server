@@ -32,12 +32,13 @@ public class ClientHandler implements Runnable {
     private BufferedReader requestReader;
     private PrintWriter responseWriter;
 
-    public ClientHandler(Socket socket, Router router, SessionManager sessionManager) {
+    public ClientHandler(Socket socket) {
         this.socket = socket;
-        this.router = router;
-        this.sessionManager = sessionManager;
+        this.router = Router.getInstance();
+        this.sessionManager = SessionManager.getInstance();
         this.clientID = UUID.randomUUID().toString();
         this.session = sessionManager.getSession(clientID, true);
+        this.session.setClientHandler(this);
         log.info("Initialize new socket connection successfully. Running for client: {}", clientID);
 
         try {
@@ -72,7 +73,7 @@ public class ClientHandler implements Runnable {
                 if (request.getEndPoint().equals(Constants.SOCKET_CLOSE))
                     return;
 
-                BaseResponse<?> response = (BaseResponse<?>) router.handleRequest(session, request.getEndPoint(), request.getRequest());
+                BaseResponse<?> response = (BaseResponse<?>) router.handleRequest(session, request);
                 responseWriter.println(gson.toJson(response));
             } catch (SocketException e) {
                 log.error("Socket connection error. Client might be disconnected", e);
@@ -84,7 +85,12 @@ public class ClientHandler implements Runnable {
                 return;
             } catch (Exception e) {
                 log.error("Failed to execute request from client", e);
-                BaseResponse<?> response = new BaseResponse<>(500, false);
+                BaseResponse<?> response = new BaseResponse<>(
+                        Constants.INTERNAL_SERVER_ERROR,
+                        false,
+                        Constants.NO_ACTION,
+                        "Failed to execute request from client"
+                );
                 responseWriter.println(gson.toJson(response));
             }
         }

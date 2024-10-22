@@ -50,4 +50,17 @@ public class Room {
         log.error("User ID is null or not found method to execute this user!");
         return false;
     }
+
+    public boolean removeUser(String userID) {
+        if (Objects.nonNull(userID)) {
+            clientHandlers.remove(userID);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isEmpty() {
+        return clientHandlers.isEmpty();
+    }
 }

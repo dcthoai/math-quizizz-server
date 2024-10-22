@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.Objects;
 
-public class SessionManager {
+public class SessionManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
     private static final SessionManager instance = new SessionManager();
@@ -19,7 +19,6 @@ public class SessionManager {
     private SessionManager() {
         this.sessions = new HashMap<>();
         this.rooms = new HashMap<>();
-        log.info("Initialize session manager successfully");
     }
 
     public static SessionManager getInstance() {
@@ -37,6 +36,11 @@ public class SessionManager {
         }
 
         return null;
+    }
+
+    public void removeRoom(String roomID) {
+        if (Objects.nonNull(roomID))
+            rooms.remove(roomID);
     }
 
     public UserSession getSession() {
@@ -74,5 +78,10 @@ public class SessionManager {
     public void invalidSession(String userId) {
         sessions.remove(userId);
         log.info("Invalid session for client: {}", userId);
+    }
+
+    @Override
+    public void run() {
+        log.info("Initialize session manager successfully. Number of users online: {}", getInstance().sessions.size());
     }
 }
