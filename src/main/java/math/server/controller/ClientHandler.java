@@ -1,6 +1,7 @@
 package math.server.controller;
 
 import com.google.gson.Gson;
+import math.server.common.Common;
 import math.server.common.Constants;
 import math.server.dto.request.BaseRequest;
 import math.server.dto.response.BaseResponse;
@@ -19,26 +20,23 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 public class ClientHandler implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(ClientHandler.class);
-    private final SessionManager sessionManager;
+    private static final SessionManager sessionManager = SessionManager.getInstance();
+    private static final Router router = Router.getInstance();
     private final UserSession session;
     private final String clientID;
-    private final Router router;
     private final Socket socket;
     private BufferedReader requestReader;
     private PrintWriter responseWriter;
 
     public ClientHandler(Socket socket) {
-        this.socket = socket;
-        this.router = Router.getInstance();
-        this.sessionManager = SessionManager.getInstance();
-        this.clientID = UUID.randomUUID().toString();
-        this.session = sessionManager.getSession(clientID, true);
+        this.clientID = Common.generateUniqueID(SessionManager.getUniqueIDs(), 6);
+        this.session = sessionManager.getSession(clientID); // Get new session
         this.session.setClientHandler(this);
+        this.socket = socket;
         log.info("Initialize new socket connection successfully. Running for client: {}", clientID);
 
         try {
@@ -109,14 +107,15 @@ public class ClientHandler implements Runnable {
         responseWriter.println(message);
     }
 
-    public void sendMessageForUserInRoom(String message, String roomID) {
+    public void sendMessageForRoom(String message, String roomID) {
         Room room = sessionManager.getRoom(roomID, false);
 
         if (Objects.nonNull(room)) {
-            Map<String, ClientHandler> userClientHandlerInRoom = room.getAllUser();
+            Map<String, UserSession> userSessionMap = room.getAllUsers();
 
-            userClientHandlerInRoom.forEach((userID, userClientHandler) -> {
-                userClientHandler.sendMessage(message);
+            userSessionMap.forEach((userID, userSession) -> {
+                if (!userSession.getUserID().equals(session.getUserID()))
+                    userSession.getClientHandler().sendMessage(message);
             });
         } else {
             log.error("Room is null. Cannot send message for users in room.");

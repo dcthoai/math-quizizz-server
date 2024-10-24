@@ -1,28 +1,28 @@
 package math.server.service.utils;
 
+import math.server.common.Common;
 import math.server.model.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.Objects;
+import java.util.*;
 
 public class SessionManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
+    private static final Set<String> uniqueIDs = new HashSet<>();
+    private static final Map<String, Room> rooms = new HashMap<>();
+    private static final Map<String, UserSession> sessions = new HashMap<>();
     private static final SessionManager instance = new SessionManager();
-    private final Map<String, Room> rooms;
-    private final Map<String, UserSession> sessions;
 
-    private SessionManager() {
-        this.sessions = new HashMap<>();
-        this.rooms = new HashMap<>();
-    }
+    private SessionManager() {}
 
     public static SessionManager getInstance() {
         return instance;
+    }
+
+    public static Set<String> getUniqueIDs() {
+        return uniqueIDs;
     }
 
     public Room getRoom(String roomID, Boolean createRoom) {
@@ -30,8 +30,9 @@ public class SessionManager implements Runnable {
             return rooms.get(roomID);
 
         if (createRoom) {   // Create new room if required
-            Room room = new Room();
-            rooms.put(room.getRoomId(), room);
+            String newRoomID = Common.generateUniqueID(uniqueIDs, 5);
+            Room room = new Room(newRoomID);
+            rooms.put(newRoomID, room);
             return room;
         }
 
@@ -44,29 +45,17 @@ public class SessionManager implements Runnable {
     }
 
     public UserSession getSession() {
-        String userID = UUID.randomUUID().toString();
-
-        if (sessions.containsKey(userID))
-            return sessions.get(userID);    // If user has a session
-        else {
-            UserSession userSession = new UserSession(userID);
-            sessions.put(userID, userSession);
-            return userSession;
-        }
+        String userID = Common.generateUniqueID(uniqueIDs, 6);
+        UserSession userSession = new UserSession(userID);
+        sessions.put(userID, userSession);
+        return userSession;
     }
 
-    public UserSession getSession(String username) {
-        return sessions.values().stream()
-                .filter(session -> session.getUsername().equals(username))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public UserSession getSession(String userID, Boolean createSession) {
+    public UserSession getSession(String userID) {
         if (sessions.containsKey(userID))
             return sessions.get(userID);    // If user has a session
 
-        if (createSession && Objects.nonNull(userID)) {     // Create new session for this user if required
+        if (Objects.nonNull(userID)) {     // Create new session for this user
             UserSession userSession = new UserSession(userID);
             sessions.put(userID, userSession);
             return userSession;
@@ -75,9 +64,25 @@ public class SessionManager implements Runnable {
         return null;
     }
 
-    public void invalidSession(String userId) {
-        sessions.remove(userId);
-        log.info("Invalid session for client: {}", userId);
+    public UserSession getSession(String username, Boolean createSession) {
+        UserSession userSession = sessions.values().stream()
+                .filter(session -> session.getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
+
+        if (createSession && Objects.isNull(userSession)) {     // Create new session for this user if required
+            String userID = Common.generateUniqueID(uniqueIDs, 6);
+            UserSession newUserSession = new UserSession(userID);
+            sessions.put(userID, newUserSession);
+            return newUserSession;
+        }
+
+        return userSession;
+    }
+
+    public void invalidSession(String userID) {
+        sessions.remove(userID);
+        log.info("Invalid session for client: {}", userID);
     }
 
     @Override

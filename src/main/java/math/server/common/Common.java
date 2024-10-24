@@ -7,8 +7,7 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Common {
 
@@ -54,5 +53,20 @@ public class Common {
         }
 
         return objectMap;
+    }
+
+    public static String generateUniqueID(Set<String> uniqueIDs, int length) {
+        Random rand = new Random();
+        StringBuilder ID = new StringBuilder();
+
+        do {
+            ID.delete(0, ID.length());
+
+            for (int i = 0; i < length; ++i) {
+                ID.append(rand.nextInt(10));
+            }
+        } while (uniqueIDs.contains(ID.toString()));
+
+        return ID.toString();
     }
 }

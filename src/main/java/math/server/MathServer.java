@@ -3,6 +3,7 @@ package math.server;
 import math.server.common.Constants;
 import math.server.router.Router;
 import math.server.service.utils.ConnectionUtil;
+import math.server.service.utils.ScheduledTasksService;
 import math.server.service.utils.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ public class MathServer {
         pool.execute(() -> ConnectionUtil.getInstance().run());
         Router.getInstance().run();
         SessionManager.getInstance().run();
+        ScheduledTasksService.getInstance().run();
 
         log.info("Application is running");
         log.info(

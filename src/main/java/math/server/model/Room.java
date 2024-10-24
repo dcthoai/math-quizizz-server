@@ -1,45 +1,48 @@
 package math.server.model;
 
 import math.server.controller.ClientHandler;
+import math.server.service.utils.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 public class Room {
 
     private static final Logger log = LoggerFactory.getLogger(Room.class);
-    private final String roomId;
-    private final Map<String, ClientHandler> clientHandlers;
+    private final String roomID;
+    private final Map<String, UserSession> users;
+    private final Map<String, Integer> ranking;
 
-    public Room() {
-        this.roomId = UUID.randomUUID().toString();
-        this.clientHandlers = new HashMap<>();
-        log.info("Created new room: {}", roomId);
+    public Room(String roomID) {
+        this.roomID = roomID;
+        this.users = new HashMap<>();
+        this.ranking = new HashMap<>();
+        log.info("Created new room: {}", roomID);
     }
 
-    public String getRoomId() {
-        return roomId;
+    public String getRoomID() {
+        return roomID;
     }
 
-    public Map<String, ClientHandler> getAllUser() {
-        return clientHandlers;
+    public Map<String, UserSession> getAllUsers() {
+        return users;
     }
 
-    public ClientHandler getOneUser(String userId) {
-        if (Objects.nonNull(userId) && clientHandlers.containsKey(userId))
-            return clientHandlers.get(userId);
+    public ClientHandler getUser(String userID) {
+        if (Objects.nonNull(userID) && users.containsKey(userID))
+            return users.get(userID).getClientHandler();
 
         return null;
     }
 
-    public boolean addNewUserToRoom(String userId, ClientHandler clientHandler) {
-        if (Objects.nonNull(userId) && Objects.nonNull(clientHandler)) {
-            if (clientHandlers.size() < 5) {
-                clientHandlers.put(userId, clientHandler);
+    public boolean addUserToRoom(String userID, UserSession userSession) {
+        if (Objects.nonNull(userID) && Objects.nonNull(userSession)) {
+            if (users.size() < 5) {
+                users.put(userID, userSession);
                 return true;
             } else {
                 log.error("This room is full!");
@@ -53,7 +56,7 @@ public class Room {
 
     public boolean removeUser(String userID) {
         if (Objects.nonNull(userID)) {
-            clientHandlers.remove(userID);
+            users.remove(userID);
             return true;
         }
 
@@ -61,6 +64,16 @@ public class Room {
     }
 
     public boolean isEmpty() {
-        return clientHandlers.isEmpty();
+        return users.isEmpty();
+    }
+
+    public Map<String, Integer> getRanking() {
+        return ranking;
+    }
+
+    public void updateRanking(List<User> users) {
+        users.forEach(user -> {
+            ranking.put(user.getUsername(), user.getScore());
+        });
     }
 }

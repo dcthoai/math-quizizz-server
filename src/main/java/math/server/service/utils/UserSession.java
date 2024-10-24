@@ -9,11 +9,13 @@ public class UserSession {
 
     private static final Logger log = LoggerFactory.getLogger(UserSession.class);
     private final String userID;
-    private ClientHandler clientHandler;
     private String username;
     private Boolean loginState;
     private Integer currentPoint;
+    private Integer currentRank;
+    private Integer correctAnswers;
     private Room currentRoom;
+    private ClientHandler clientHandler;
 
     public UserSession(String userID) {
         this.userID = userID;
@@ -62,5 +64,21 @@ public class UserSession {
 
     public void setClientHandler(ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
+    }
+
+    public Integer getCurrentRank() {
+        return currentRank;
+    }
+
+    public void setCurrentRank(Integer currentRank) {
+        this.currentRank = currentRank;
+    }
+
+    public Integer getCorrectAnswers() {
+        return correctAnswers;
+    }
+
+    public void setCorrectAnswers(Integer correctAnswers) {
+        this.correctAnswers = correctAnswers;
     }
 }

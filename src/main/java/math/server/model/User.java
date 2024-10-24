@@ -6,7 +6,8 @@ package math.server.model;
  */
 public class User {
 
-    private Integer id, currentRank, currentPoint, totalPoint;
+    private Integer ID, gamesPlayed, score, rank;
+    private Float winRate;
     private String username, password;
 
     public User() {}
@@ -16,36 +17,20 @@ public class User {
         this.password = password;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getID() {
+        return ID;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setID(Integer ID) {
+        this.ID = ID;
     }
 
-    public Integer getCurrentRank() {
-        return currentRank;
+    public Integer getScore() {
+        return score;
     }
 
-    public void setCurrentRank(Integer currentRank) {
-        this.currentRank = currentRank;
-    }
-
-    public Integer getCurrentPoint() {
-        return currentPoint;
-    }
-
-    public void setCurrentPoint(Integer currentPoint) {
-        this.currentPoint = currentPoint;
-    }
-
-    public Integer getTotalPoint() {
-        return totalPoint;
-    }
-
-    public void setTotalPoint(Integer totalPoint) {
-        this.totalPoint = totalPoint;
+    public void setScore(Integer score) {
+        this.score = score;
     }
 
     public String getUsername() {
@@ -62,5 +47,29 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Integer getGamesPlayed() {
+        return gamesPlayed;
+    }
+
+    public void setGamesPlayed(Integer gamesPlayed) {
+        this.gamesPlayed = gamesPlayed;
+    }
+
+    public Float getWinRate() {
+        return winRate;
+    }
+
+    public void setWinRate(Float winRate) {
+        this.winRate = winRate;
+    }
+
+    public Integer getRank() {
+        return rank;
+    }
+
+    public void setRank(Integer rank) {
+        this.rank = rank;
     }
 }

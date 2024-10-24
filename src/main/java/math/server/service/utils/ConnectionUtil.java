@@ -1,6 +1,5 @@
 package math.server.service.utils;
 
-import math.server.MathServer;
 import math.server.common.Constants;
 import math.server.controller.ClientHandler;
 import org.slf4j.Logger;

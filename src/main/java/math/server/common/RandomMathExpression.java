@@ -1,102 +1,100 @@
 package math.server.common;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class RandomMathExpression {
 
     public static void main(String[] args) {
-        for(int i = 0; i< 10; ++i ) {
-            int targetNumber = generateRandomNumber(2, 100);
-            String[] expressions = generateRandomExpressions(targetNumber);
+        // Bước 1: Tạo mảng chứa 5 số ngẫu nhiên từ 2 - 10
+        for (int k = 0; k< 10; ++k) {
+            Random rand = new Random();
+            ArrayList<Integer> numbers = new ArrayList<>();
 
-            System.out.println("Target number: " + targetNumber);
-            for (String expression : expressions) {
-                System.out.println(expression);
+            for (int i = 0; i < 5; i++) {
+                int randomNum = rand.nextInt(9) + 2; // Số ngẫu nhiên từ 2 đến 10
+                numbers.add(randomNum);
             }
 
-            System.out.println("---------");
-        }
-    }
+            System.out.println("5 số ngẫu nhiên: " + numbers);
 
-    // Hàm sinh số ngẫu nhiên trong khoảng [min, max], tránh 0 và 1
-    public static int generateRandomNumber(int min, int max) {
-        Random random = new Random();
-        int number;
-        do {
-            number = random.nextInt(max - min + 1) + min;
-        } while (number == 0 || number == 1);  // Loại bỏ 0 và 1
-        return number;
-    }
+            // Bước 2: Lấy ngẫu nhiên 3 số từ 5 số
+            Collections.shuffle(numbers); // Trộn mảng
+            int num1 = numbers.get(0);
+            int num2 = numbers.get(1);
+            int num3 = numbers.get(2);
 
-    // Hàm sinh 4 phép tính với 1 phép tính đúng
-    public static String[] generateRandomExpressions(int targetNumber) {
-        Random random = new Random();
-        String[] expressions = new String[4];
-        int correctIndex = random.nextInt(4);  // Chọn vị trí cho phép tính đúng
+            System.out.println("3 số được chọn: " + num1 + ", " + num2 + ", " + num3);
 
-        for (int i = 0; i < 4; i++) {
-            if (i == correctIndex) {
-                // Phép tính đúng với targetNumber
-                expressions[i] = generateCorrectExpression(targetNumber);
-            } else {
-                // Phép tính sai
-                expressions[i] = generateIncorrectExpression();
+            // Bước 3: Chọn ngẫu nhiên 2 loại phép toán từ +, -, *, /
+            char[] operations = {'*', '/', '+', '-'};
+            boolean validOperation = false;
+            int result = 0;
+            String expression = "";
+
+            while (!validOperation) {
+                char operation1 = operations[rand.nextInt(4)];
+                char operation2 = operations[rand.nextInt(4)];
+
+                // Bước 4: Tạo phép tính
+                boolean isValidDivision = true;
+                int intermediateResult = 0;
+
+                // Thực hiện phép tính đầu tiên
+                switch (operation1) {
+                    case '+':
+                        intermediateResult = num1 + num2;
+                        break;
+                    case '-':
+                        intermediateResult = num1 - num2;
+                        break;
+                    case '*':
+                        intermediateResult = num1 * num2;
+                        break;
+                    case '/':
+                        if (num2 != 0 && num1 % num2 == 0) {
+                            intermediateResult = num1 / num2;
+                        } else {
+                            isValidDivision = false;
+                        }
+                        break;
+                }
+
+                // Nếu phép chia không hợp lệ thì chọn lại
+                if (!isValidDivision) {
+                    continue;
+                }
+
+                // Thực hiện phép tính thứ hai với intermediateResult và num3
+                switch (operation2) {
+                    case '+':
+                        result = intermediateResult + num3;
+                        validOperation = true;
+                        expression = "(" + num1 + " " + operation1 + " " + num2 + ") " + operation2 + " " + num3;
+                        break;
+                    case '-':
+                        result = intermediateResult - num3;
+                        validOperation = true;
+                        expression = "(" + num1 + " " + operation1 + " " + num2 + ") " + operation2 + " " + num3;
+                        break;
+                    case '*':
+                        result = intermediateResult * num3;
+                        validOperation = true;
+                        expression = "(" + num1 + " " + operation1 + " " + num2 + ") " + operation2 + " " + num3;
+                        break;
+                    case '/':
+                        if (num3 != 0 && intermediateResult % num3 == 0) {
+                            result = intermediateResult / num3;
+                            validOperation = true;
+                            expression = "(" + num1 + " " + operation1 + " " + num2 + ") " + operation2 + " " + num3;
+                        }
+                        break;
+                }
             }
+
+            // In ra phép tính và kết quả
+            System.out.println("Phép tính: " + expression + " = " + result);
         }
-
-        return expressions;
-    }
-
-    // Hàm sinh phép tính đúng, bao gồm cả *, /
-    public static String generateCorrectExpression(int targetNumber) {
-        Random random = new Random();
-        int a = generateRandomNumber(2, 50);
-        int b = generateRandomNumber(2, 10); // Để phép chia dễ cho kết quả nguyên
-        int c;
-
-        // Chọn phép toán ngẫu nhiên bao gồm cả *, /
-        String[] operators = {"+", "-", "*", "/"};
-        String operator1 = operators[random.nextInt(4)];
-        String operator2 = operators[random.nextInt(4)];
-
-        // Tạo phép tính với targetNumber
-        if (operator1.equals("/") && b != 0 && a % b != 0) {
-            a = a - (a % b); // Điều chỉnh a để a / b cho kết quả nguyên
-        }
-        if (operator2.equals("/") && targetNumber % b != 0) {
-            c = targetNumber / b;
-        } else {
-            c = generateRandomNumber(2, 10);
-        }
-
-        return a + " " + operator1 + " " + b + " " + operator2 + " " + c + " TRUE";
-    }
-
-    // Hàm sinh phép tính sai với 2 phép toán và 3 số
-    public static String generateIncorrectExpression() {
-        Random random = new Random();
-        int a = generateRandomNumber(2, 50);
-        int b = generateRandomNumber(2, 50);
-        int c = generateRandomNumber(2, 50);
-
-        // Chọn 2 phép toán ngẫu nhiên từ 4 phép cộng, trừ, nhân, chia
-        String[] operators = {"+", "-", "*", "/"};
-        String operator1, operator2;
-
-        // Đảm bảo không có 2 dấu giống nhau
-        do {
-            operator1 = operators[random.nextInt(4)];
-            operator2 = operators[random.nextInt(4)];
-        } while (operator1.equals(operator2));
-
-        // Đảm bảo phép chia chỉ được thực hiện khi kết quả là số nguyên
-        if (operator1.equals("/") && b != 0 && a % b != 0) {
-            a = a - (a % b); // Điều chỉnh a để a / b cho kết quả nguyên
-        }
-        if (operator2.equals("/") && c != 0 && b % c != 0) {
-            b = b - (b % c); // Điều chỉnh b để b / c cho kết quả nguyên
-        }
-
-        return a + " " + operator1 + " " + b + " " + operator2 + " " + c;
     }
 }

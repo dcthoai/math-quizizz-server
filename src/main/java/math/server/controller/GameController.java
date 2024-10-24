@@ -31,20 +31,20 @@ public class GameController implements RouterMapping {
         if (Objects.nonNull(room) && room.isEmpty())
             return new BaseResponse<>(400, false, "/game/start", "Not found room or empty room");
 
-        Map<String, ClientHandler> clientHandlerMap = room.getAllUser();
-        List<ClientHandler> clientHandlers = new ArrayList<>(clientHandlerMap.values());
+        Map<String, UserSession> userSessionMap = room.getAllUsers();
+        List<UserSession> userSessions = new ArrayList<>(userSessionMap.values());
 
-        scheduledTasksService.setInterval(() -> playGame(clientHandlers), Constants.QUESTION_TIMEOUT);
-        scheduledTasksService.setTimeout(() -> finishGame(clientHandlers), Constants.GAME_TIMEOUT);
+        scheduledTasksService.setInterval(() -> playGame(userSessions), Constants.QUESTION_TIMEOUT);
+        scheduledTasksService.setTimeout(() -> finishGame(userSessions), Constants.GAME_TIMEOUT);
 
         return new BaseResponse<>(200, true, "/game/start");
     }
 
-    private void playGame(List<ClientHandler> clientHandlers) {
+    private void playGame(List<UserSession> userSessions) {
 
     }
 
-    private void finishGame(List<ClientHandler> clientHandlers) {
+    private void finishGame(List<UserSession> userSessions) {
 
     }
 }

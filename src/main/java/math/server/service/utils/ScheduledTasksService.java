@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ScheduledTasksService {
+public class ScheduledTasksService implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasksService.class);
     private static final ScheduledTasksService instance = new ScheduledTasksService();
@@ -41,5 +41,10 @@ public class ScheduledTasksService {
             scheduler.shutdownNow();
             Thread.currentThread().interrupt(); // Restore interrupt status
         }
+    }
+
+    @Override
+    public void run() {
+        log.info("Initialize schedule tasks service");
     }
 }

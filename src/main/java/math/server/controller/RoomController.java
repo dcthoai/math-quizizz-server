@@ -44,7 +44,7 @@ public class RoomController implements RouterMapping {
         Room room = sessionManager.getRoom(roomID, false);
 
         if (Objects.nonNull(room)) {
-            boolean isSuccess = room.addNewUserToRoom(session.getUserID(), session.getClientHandler());
+            boolean isSuccess = room.addUserToRoom(session.getUserID(), session);
 
             if (isSuccess) {
                 session.setCurrentRoom(room);
@@ -66,7 +66,7 @@ public class RoomController implements RouterMapping {
             boolean isSuccess = room.removeUser(session.getUserID());
 
             if (room.isEmpty())
-                sessionManager.removeRoom(room.getRoomId());
+                sessionManager.removeRoom(room.getRoomID());
 
             return new BaseResponse<>(200, isSuccess, "/room/exit");
         }
