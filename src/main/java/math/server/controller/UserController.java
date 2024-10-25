@@ -45,7 +45,7 @@ public class UserController implements RouterMapping {
                 return new BaseResponse<>(Constants.SUCCESS, true, request.getAction(), "Register successfully!", session.getUserID());
             }
 
-            return new BaseResponse<>(Constants.SUCCESS, false, request.getAction(), "Login failed! Invalid username or password.");
+            return new BaseResponse<>(Constants.SUCCESS, false, request.getAction(), "Register failed! Cannot create your account");
         } catch (Exception e) {
             log.error("Failed to register new account", e);
             return new BaseResponse<>(Constants.INTERNAL_SERVER_ERROR, false, request.getAction(), "Register failed!");

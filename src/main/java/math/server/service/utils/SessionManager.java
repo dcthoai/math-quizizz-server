@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SessionManager implements Runnable {
 
@@ -37,6 +38,14 @@ public class SessionManager implements Runnable {
         }
 
         return null;
+    }
+
+    public List<Room> getRooms(Boolean isAvailable) {
+        if (isAvailable) {
+            return rooms.values().stream().filter(room -> !room.isPlayingGame() && !room.isFull()).collect(Collectors.toList());
+        }
+
+        return new ArrayList<>(rooms.values());
     }
 
     public void removeRoom(String roomID) {

@@ -17,12 +17,12 @@ public class UserService implements IUserService {
 
     @Override
     public Integer save(UserRequest user) {
-        return userRepository.insert("user", new User(user.getUsername(), user.getPassword()));
+        return userRepository.insert(User.class, new User(user.getUsername(), user.getPassword()));
     }
 
     @Override
     public User findUserById(int id) {
-        return (User) userRepository.findOne(id, User.class);
+        return userRepository.findOne(User.class, id);
     }
 
     @Override

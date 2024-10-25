@@ -14,6 +14,7 @@ public class Room {
 
     private static final Logger log = LoggerFactory.getLogger(Room.class);
     private final String roomID;
+    private Boolean isPlayingGame = false;
     private final Map<String, UserSession> users;
     private final Map<String, Integer> ranking;
 
@@ -67,6 +68,10 @@ public class Room {
         return users.isEmpty();
     }
 
+    public boolean isFull() {
+        return users.size() < 5;
+    }
+
     public Map<String, Integer> getRanking() {
         return ranking;
     }
@@ -75,5 +80,13 @@ public class Room {
         users.forEach(user -> {
             ranking.put(user.getUsername(), user.getScore());
         });
+    }
+
+    public Boolean isPlayingGame() {
+        return isPlayingGame;
+    }
+
+    public void setPlayingGame(Boolean playingGame) {
+        isPlayingGame = playingGame;
     }
 }

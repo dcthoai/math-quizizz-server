@@ -8,9 +8,9 @@ public interface Constants {
 
     Integer MAX_CONNECTION = 10;
     Integer MIN_CONNECTION_IDLE = 2;
-    Long CONNECTION_IDLE_TIMEOUT = 10 * 60 * 1000L; // 10 minutes
+    Long CONNECTION_IDLE_TIMEOUT = 2 * 60 * 1000L; // 2 minutes
     Long CONNECTION_TIMEOUT = 2 * 60 * 1000L; // 2 minutes
-    Long CONNECTION_LIFETIME = 20 * 60 * 1000L; // 20 minutes
+    Long CONNECTION_LIFETIME = 10 * 60 * 1000L; // 10 minutes
 
     String CONTROLLER_PACKAGE = "math.server.controller";
     String SOCKET_CLOSE = "EXIT";

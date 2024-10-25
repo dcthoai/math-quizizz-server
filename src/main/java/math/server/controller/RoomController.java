@@ -10,6 +10,7 @@ import math.server.service.utils.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Objects;
 
 @EndPoint("/api/room")
@@ -19,9 +20,21 @@ public class RoomController implements RouterMapping {
     private static final Logger log = LoggerFactory.getLogger(RoomController.class);
     private final SessionManager sessionManager = SessionManager.getInstance();
 
-    @EndPoint("/new")
+    @EndPoint()
+    public BaseResponse<?> getRooms(UserSession session) {
+        List<Room> rooms = sessionManager.getRooms(false);
+        return new BaseResponse<>(200, true, "/room/all", "Get all rooms successfully", rooms);
+    }
+
+    @EndPoint("/available")
+    public BaseResponse<?> getAvailableRooms(UserSession session) {
+        List<Room> rooms = sessionManager.getRooms(true);
+        return new BaseResponse<>(200, true, "/room/all", "Get all available rooms successfully", rooms);
+    }
+
+    @EndPoint("/create")
     public BaseResponse<?> createRoom(UserSession session) {
-        Room room = sessionManager.getRoom(null, true);
+        Room room = sessionManager.getRoom(null, true);  // Create new room
         session.setCurrentRoom(room);
 
         return new BaseResponse<>(200, true, "/room/new", "Create new room successful");
