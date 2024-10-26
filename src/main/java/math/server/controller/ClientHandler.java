@@ -71,7 +71,7 @@ public class ClientHandler implements Runnable {
                 if (request.getEndPoint().equals(Constants.SOCKET_CLOSE))
                     return;
 
-                BaseResponse<?> response = (BaseResponse<?>) router.handleRequest(session, request);
+                BaseResponse response = (BaseResponse) router.handleRequest(session, request);
                 responseWriter.println(gson.toJson(response));
             } catch (SocketException e) {
                 log.error("Socket connection error. Client might be disconnected", e);
@@ -83,7 +83,7 @@ public class ClientHandler implements Runnable {
                 return;
             } catch (Exception e) {
                 log.error("Failed to execute request from client", e);
-                BaseResponse<?> response = new BaseResponse<>(
+                BaseResponse response = new BaseResponse(
                         Constants.INTERNAL_SERVER_ERROR,
                         false,
                         Constants.NO_ACTION,

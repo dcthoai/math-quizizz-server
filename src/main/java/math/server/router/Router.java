@@ -79,11 +79,11 @@ public class Router implements Runnable {
                 return method.invoke(controllerInstance, session, request);
             } catch (Exception e) {
                 log.error("Failed to handle request", e);
-                return new BaseResponse<>(Constants.INTERNAL_SERVER_ERROR, false, request.getAction(), e.getMessage());
+                return new BaseResponse(Constants.INTERNAL_SERVER_ERROR, false, request.getAction(), e.getMessage());
             }
         } else {
             log.error("Could not found method to handle this request");
-            return new BaseResponse<>(Constants.NOT_FOUND, false, request.getAction(), "Could not found method to handle this request");
+            return new BaseResponse(Constants.NOT_FOUND, false, request.getAction(), "Could not found method to handle this request");
         }
     }
 

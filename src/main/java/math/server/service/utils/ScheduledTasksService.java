@@ -3,8 +3,12 @@ package math.server.service.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class ScheduledTasksService implements Runnable {
@@ -12,6 +16,7 @@ public class ScheduledTasksService implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasksService.class);
     private static final ScheduledTasksService instance = new ScheduledTasksService();
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private static final Map<String, ScheduledFuture<?>> scheduledTasks = new HashMap<>();
 
     private ScheduledTasksService() {}
 
@@ -19,14 +24,49 @@ public class ScheduledTasksService implements Runnable {
         return instance;
     }
 
-    public void setTimeout(Runnable task, long delay) {
+    public void setTimeout(Runnable task, String UID, long delay) {
+        ScheduledFuture<?> scheduledFuture;
+
+        if (scheduledTasks.containsKey(UID)) {
+            scheduledFuture = scheduledTasks.get(UID);
+
+            if (Objects.nonNull(scheduledFuture) && !scheduledFuture.isCancelled()) {
+                scheduledFuture.cancel(true);
+            }
+        }
+
         log.info("Scheduling task to run after {} milliseconds", delay);
-        scheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
+        scheduledFuture = scheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
+        scheduledTasks.put(UID, scheduledFuture);
     }
 
-    public void setInterval(Runnable task, long intervalTime) {
+    public void setInterval(Runnable task, String UID, long intervalTime) {
+        ScheduledFuture<?> scheduledFuture;
+
+        if (scheduledTasks.containsKey(UID)) {
+            scheduledFuture = scheduledTasks.get(UID);
+
+            if (Objects.nonNull(scheduledFuture) && !scheduledFuture.isCancelled()) {
+                scheduledFuture.cancel(true);
+            }
+        }
+
         log.info("Scheduling task to run every {} milliseconds", intervalTime);
-        scheduler.scheduleAtFixedRate(task, 0, intervalTime, TimeUnit.MILLISECONDS);
+        scheduledFuture = scheduler.scheduleAtFixedRate(task, 0, intervalTime, TimeUnit.MILLISECONDS);
+        scheduledTasks.put(UID, scheduledFuture);
+    }
+
+    public void shutdownTask(String UID) {
+        if (scheduledTasks.containsKey(UID)) {
+            ScheduledFuture<?> scheduledFuture = scheduledTasks.get(UID);
+
+            if (Objects.nonNull(scheduledFuture) && !scheduledFuture.isCancelled()) {
+                scheduledFuture.cancel(true);
+            }
+
+            scheduledTasks.remove(UID);
+            log.info("Shutdown and remove task with ID: {}", UID);
+        }
     }
 
     public void shutdown() {

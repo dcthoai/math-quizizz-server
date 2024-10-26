@@ -30,8 +30,10 @@ public interface Constants {
     Integer SOCKET_INVALID_DATA = 4000;
     Integer UNKNOWN_SOCKET_SERVER = 5000;
 
-    Long QUESTION_TIMEOUT = 30 * 1000L; // 30 seconds
-    Long GAME_TIMEOUT = 10 * 30 * 1000L; // 5 minutes equivalent to 10 question
+    Long QUESTION_TIMEOUT = 5 * 1000L; // 30 seconds
+    Long GAME_TIMEOUT = 1 * 30 * 1000L; // 5 minutes equivalent to 10 question
+    String TIMEOUT_TASK = "TIMEOUT_";
+    String INTERVAL_TASK = "INTERVAL_";
 
     String ANSI_RESET = "\u001B[0m";
     String ANSI_RED = "\u001B[31m";
@@ -41,10 +43,10 @@ public interface Constants {
     String ANSI_PURPLE = "\u001B[35m";
 
     String APP_NAME = "\n" +
-        ANSI_GREEN + "\n\t ██╗     ╔██╗" + ANSI_RED + "    ██╗_   ████████╗ ██╗   ██╗      ██████╗ ████████╗ ███████╗  ██╗    ██╗ ████████╗ ███████╗    " + ANSI_RESET +
-        ANSI_GREEN + "\n\t ███╗   ╔███║" + ANSI_RED + "  █║   █╗  ╚══██╔══╝ ██║   ██║     ██╔════╝ ██╔═════╝ ██╔═══██╗ ██║    ██║ ██╔═════╝ ██╔═══██╗   " + ANSI_RESET +
-        ANSI_GREEN + "\n\t ██║╚███║ ██║" + ANSI_RED + " ████████╗    ██║    ████████║     ╚█████╗  ██████╗   ███████╔╝ ██║    ██║ ██████╗   ███████╔╝   " + ANSI_RESET +
-        ANSI_GREEN + "\n\t ██║ ╚═╝  ██║" + ANSI_RED + " ██╔═══██║    ██║    ██╔═══██║      ╚═══██╗ ██╔═══╝   ██╔══██║   ██║  ██║  ██╔═══╝   ██╔══██║    " + ANSI_RESET +
-        ANSI_GREEN + "\n\t ██║      ██║" + ANSI_RED + " ██║   ██║    ██║    ██║   ██║     ██████╔╝ ████████╗ ██║  ╚██╗   ╚████║   ████████╗ ██║  ╚██╗   " + ANSI_RESET +
-        ANSI_GREEN + "\n\t ╚═╝      ╚═╝" + ANSI_RED + " ╚═╝   ╚═╝    ╚═╝    ╚═╝   ╚═╝     ╚═════╝  ╚═══════╝ ╚═╝   ╚═╝    ╚══╝    ╚═══════╝ ╚═╝   ╚═╝ \n" + ANSI_RESET;
+        ANSI_GREEN + "\n\t ██╗     ██╗" + ANSI_RED + "    ██╗    ████████╗ ██╗   ██╗      ██████╗ ████████╗ ███████╗  ██╗    ██╗ ████████╗ ███████╗    " + ANSI_RESET +
+        ANSI_GREEN + "\n\t ███╗   ███║" + ANSI_RED + "  █║   █╗  ╚══██╔══╝ ██║   ██║     ██╔════╝ ██╔═════╝ ██╔═══██╗ ██║    ██║ ██╔═════╝ ██╔═══██╗   " + ANSI_RESET +
+        ANSI_GREEN + "\n\t ██║█╗ █╝██║" + ANSI_RED + " ████████╗    ██║    ████████║     ╚█████╗  ██████╗   ███████╔╝ ██║    ██║ ██████╗   ███████╔╝   " + ANSI_RESET +
+        ANSI_GREEN + "\n\t ██║ ██╝ ██║" + ANSI_RED + " ██╔═══██║    ██║    ██╔═══██║      ╚═══██╗ ██╔═══╝   ██╔══██║   ██║  ██║  ██╔═══╝   ██╔══██║    " + ANSI_RESET +
+        ANSI_GREEN + "\n\t ██║     ██║" + ANSI_RED + " ██║   ██║    ██║    ██║   ██║     ██████╔╝ ████████╗ ██║  ╚██╗   ╚████║   ████████╗ ██║  ╚██╗   " + ANSI_RESET +
+        ANSI_GREEN + "\n\t ╚═╝     ╚═╝" + ANSI_RED + " ╚═╝   ╚═╝    ╚═╝    ╚═╝   ╚═╝     ╚═════╝  ╚═══════╝ ╚═╝   ╚═╝    ╚══╝    ╚═══════╝ ╚═╝   ╚═╝ \n" + ANSI_RESET;
 }

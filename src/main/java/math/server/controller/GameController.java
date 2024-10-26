@@ -1,6 +1,9 @@
 package math.server.controller;
 
+import com.google.gson.Gson;
+import math.server.common.Common;
 import math.server.common.Constants;
+import math.server.dto.request.BaseRequest;
 import math.server.dto.response.BaseResponse;
 import math.server.model.Room;
 import math.server.router.EndPoint;
@@ -23,28 +26,44 @@ public class GameController implements RouterMapping {
     private static final Logger log = LoggerFactory.getLogger(GameController.class);
     private final SessionManager sessionManager = SessionManager.getInstance();
     private final ScheduledTasksService scheduledTasksService = ScheduledTasksService.getInstance();
+    private final Gson gson = new Gson();
 
     @EndPoint("/start")
-    public BaseResponse<?> startGame(UserSession session) {
+    public BaseResponse startGame(UserSession session, BaseRequest request) {
+        session.setCurrentRoom(new Room(Common.generateUniqueID(SessionManager.getUniqueIDs(), 5)));
+        session.getCurrentRoom().addUserToRoom(session.getUserID(), session);
         Room room = session.getCurrentRoom();
 
         if (Objects.nonNull(room) && room.isEmpty())
-            return new BaseResponse<>(400, false, "/game/start", "Not found room or empty room");
+            return new BaseResponse(Constants.BAD_REQUEST, false, "/game/start", "Not found room or empty room");
 
         Map<String, UserSession> userSessionMap = room.getAllUsers();
         List<UserSession> userSessions = new ArrayList<>(userSessionMap.values());
 
-        scheduledTasksService.setInterval(() -> playGame(userSessions), Constants.QUESTION_TIMEOUT);
-        scheduledTasksService.setTimeout(() -> finishGame(userSessions), Constants.GAME_TIMEOUT);
+        scheduledTasksService.setInterval(() -> playGame(userSessions), Constants.INTERVAL_TASK + room.getRoomID(), Constants.QUESTION_TIMEOUT);
+        scheduledTasksService.setTimeout(() -> finishGame(userSessions, room.getRoomID()), Constants.TIMEOUT_TASK + room.getRoomID(), Constants.GAME_TIMEOUT);
 
-        return new BaseResponse<>(200, true, "/game/start");
+        return new BaseResponse(Constants.SUCCESS, true, "/game/start", "Playing, let choose answer", "Game over");
     }
 
     private void playGame(List<UserSession> userSessions) {
-
+        sendMessageToRoom(userSessions, new BaseResponse(200, true, "/game/question", "Playing, let choose answer", "Playing, let choose answer"));
     }
 
-    private void finishGame(List<UserSession> userSessions) {
+    private void finishGame(List<UserSession> userSessions, String UID) {
+        scheduledTasksService.shutdownTask(Constants.INTERVAL_TASK + UID);
+        scheduledTasksService.shutdownTask(Constants.TIMEOUT_TASK + UID);
 
+        sendMessageToRoom(userSessions, new BaseResponse(200, true, "/game/finish", "Game over", "Game over"));
+    }
+
+    private void sendMessageToRoom(List<UserSession> sessions, BaseResponse response) {
+        sessions.forEach(session -> {
+            ClientHandler clientHandler = session.getClientHandler();
+
+            if (Objects.nonNull(clientHandler)) {
+                clientHandler.sendMessage(gson.toJson(response));
+            }
+        });
     }
 }
