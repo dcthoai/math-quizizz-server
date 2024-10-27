@@ -7,8 +7,16 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.*;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.Random;
+
+/**
+ * Common methods for data processing and data conversion
+ * @author dcthoai
+ */
 public class Common {
 
     private static final Logger log = LoggerFactory.getLogger(Common.class);

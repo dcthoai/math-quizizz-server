@@ -43,8 +43,10 @@ public class RoomController implements RouterMapping {
         Room room = sessionManager.getRoom(null, true);  // Create new room
         session.setCurrentRoom(room);
 
-        List<UserSession> sessions = new ArrayList<>(room.getAllUsers().values());
-        List<String> users = sessions.stream().map(UserSession::getUsername).collect(Collectors.toList());
+//        List<UserSession> sessions = new ArrayList<>(room.getAllUsers().values());
+//        List<String> users = sessions.stream().map(UserSession::getUsername).collect(Collectors.toList());
+
+        List<String> users = List.of("ansd", "skfnns", "thoai");
         RoomDTO roomDTO = new RoomDTO(room.getRoomID(), false, users);
 
         return new BaseResponse(Constants.NO_ACTION, roomDTO);

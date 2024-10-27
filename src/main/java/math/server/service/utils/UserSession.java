@@ -5,6 +5,11 @@ import math.server.model.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Session of a specific user. <p>
+ * Contains information about the user, login status, game information and handler to handle socket communication.
+ * @author dcthoai
+ */
 public class UserSession {
 
     private static final Logger log = LoggerFactory.getLogger(UserSession.class);

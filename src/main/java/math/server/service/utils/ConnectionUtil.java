@@ -11,6 +11,12 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * A class to manage socket server connection <p>
+ * Listen for connection requests from clients <p>
+ * When a client is connected, initiate a separate thread to handle communication with it
+ * @author dcthoai
+ */
 public class ConnectionUtil implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectionUtil.class);

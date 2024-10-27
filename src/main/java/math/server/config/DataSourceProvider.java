@@ -9,6 +9,11 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * A class to manage database connections <p>
+ * Use the Hikari library to configure and manage data sources
+ * @author dcthoai
+ */
 public class DataSourceProvider {
 
     private static final Logger log = LoggerFactory.getLogger(DataSourceProvider.class);

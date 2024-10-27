@@ -21,6 +21,11 @@ import java.net.SocketException;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * A class to manage socket connection of a client and forward all requests to the router for processing <p>
+ * Provides methods for communicating with clients and managing connections
+ * @author dcthoai
+ */
 public class ClientHandler implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(ClientHandler.class);
@@ -55,7 +60,7 @@ public class ClientHandler implements Runnable {
 
         while (true) {
             try {
-                String jsonRequest = requestReader.readLine();
+                String jsonRequest = requestReader.readLine();  // Read request from client as json string
 
                 if (Objects.isNull(jsonRequest)) {
                     log.warn("Client disconnected");
@@ -71,7 +76,10 @@ public class ClientHandler implements Runnable {
                 if (request.getEndPoint().equals(Constants.SOCKET_CLOSE))
                     return;
 
+                // Use router to process request
                 BaseResponse response = (BaseResponse) router.handleRequest(session, request);
+
+                // Response for client
                 responseWriter.println(gson.toJson(response));
             } catch (SocketException e) {
                 log.error("Socket connection error. Client might be disconnected", e);

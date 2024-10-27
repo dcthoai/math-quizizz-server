@@ -16,6 +16,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A class that provides basic CRUD methods for manipulating the database
+ * @param <T> Name of the entity that wants to operate with the database
+ * @author dcthoai
+ */
 public class EntityManager<T> implements IEntityManager<T> {
 
     private static final Logger log = LoggerFactory.getLogger(EntityManager.class);

@@ -1,9 +1,5 @@
 package math.server.model;
 
-/**
- *
- * @author dcthoai
- */
 public class User {
 
     private Integer ID, gamesPlayed, score, rank;

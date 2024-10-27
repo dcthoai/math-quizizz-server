@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 
 @EndPoint("/api/game")
-@SuppressWarnings("unused")
 public class GameController implements RouterMapping {
 
     private static final Logger log = LoggerFactory.getLogger(GameController.class);
@@ -29,6 +28,7 @@ public class GameController implements RouterMapping {
     private final Gson gson = new Gson();
 
     @EndPoint("/start")
+    @SuppressWarnings("unused")
     public BaseResponse startGame(UserSession session, BaseRequest request) {
         session.setCurrentRoom(new Room(Common.generateUniqueID(SessionManager.getUniqueIDs(), 5)));
         session.getCurrentRoom().addUserToRoom(session.getUserID(), session);
@@ -43,18 +43,18 @@ public class GameController implements RouterMapping {
         scheduledTasksService.setInterval(() -> playGame(userSessions), Constants.INTERVAL_TASK + room.getRoomID(), Constants.QUESTION_TIMEOUT);
         scheduledTasksService.setTimeout(() -> finishGame(userSessions, room.getRoomID()), Constants.TIMEOUT_TASK + room.getRoomID(), Constants.GAME_TIMEOUT);
 
-        return new BaseResponse(Constants.SUCCESS, true, "/game/start", "Playing, let choose answer", "Game over");
+        return new BaseResponse(Constants.SUCCESS, true, Constants.NO_ACTION, "Playing, let choose answer", "Game over");
     }
 
     private void playGame(List<UserSession> userSessions) {
-        sendMessageToRoom(userSessions, new BaseResponse(200, true, "/game/question", "Playing, let choose answer", "Playing, let choose answer"));
+        sendMessageToRoom(userSessions, new BaseResponse(Constants.SUCCESS, true, "/game/question", "Playing, let choose answer", "Playing, let choose answer"));
     }
 
     private void finishGame(List<UserSession> userSessions, String UID) {
         scheduledTasksService.shutdownTask(Constants.INTERVAL_TASK + UID);
         scheduledTasksService.shutdownTask(Constants.TIMEOUT_TASK + UID);
 
-        sendMessageToRoom(userSessions, new BaseResponse(200, true, "/game/finish", "Game over", "Game over"));
+        sendMessageToRoom(userSessions, new BaseResponse(Constants.SUCCESS, true, "/game/finish", "Game over", "Game over"));
     }
 
     private void sendMessageToRoom(List<UserSession> sessions, BaseResponse response) {

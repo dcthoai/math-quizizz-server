@@ -5,9 +5,19 @@ import math.server.model.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
+/**
+ * A class to manage user sessions, information about active game rooms
+ * @author dcthoai
+ */
 public class SessionManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(SessionManager.class);

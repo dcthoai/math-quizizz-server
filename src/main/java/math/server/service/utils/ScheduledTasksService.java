@@ -11,6 +11,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A class to manage scheduled tasks
+ * @author dcthoai
+ */
 public class ScheduledTasksService implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasksService.class);
@@ -30,14 +34,16 @@ public class ScheduledTasksService implements Runnable {
         if (scheduledTasks.containsKey(UID)) {
             scheduledFuture = scheduledTasks.get(UID);
 
+            // Cancel the old task if it was previously registered
             if (Objects.nonNull(scheduledFuture) && !scheduledFuture.isCancelled()) {
                 scheduledFuture.cancel(true);
             }
         }
 
         log.info("Scheduling task to run after {} milliseconds", delay);
+        // Schedule a task to be executed after a delay of a time equal to delay variable (milliseconds)
         scheduledFuture = scheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
-        scheduledTasks.put(UID, scheduledFuture);
+        scheduledTasks.put(UID, scheduledFuture);   // Save scheduled tasks to the map to cancel when needed
     }
 
     public void setInterval(Runnable task, String UID, long intervalTime) {
@@ -46,14 +52,16 @@ public class ScheduledTasksService implements Runnable {
         if (scheduledTasks.containsKey(UID)) {
             scheduledFuture = scheduledTasks.get(UID);
 
+            // Cancel the old task if it was previously registered
             if (Objects.nonNull(scheduledFuture) && !scheduledFuture.isCancelled()) {
                 scheduledFuture.cancel(true);
             }
         }
 
         log.info("Scheduling task to run every {} milliseconds", intervalTime);
+        // Schedule a task to repeat every time interval equal to a intervalTime variable (milliseconds)
         scheduledFuture = scheduler.scheduleAtFixedRate(task, 0, intervalTime, TimeUnit.MILLISECONDS);
-        scheduledTasks.put(UID, scheduledFuture);
+        scheduledTasks.put(UID, scheduledFuture);   // Save scheduled tasks to the map to cancel when needed
     }
 
     public void shutdownTask(String UID) {
