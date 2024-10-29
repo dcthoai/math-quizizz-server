@@ -31,13 +31,14 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public boolean checkLogin(UserRequest user) {
-        User account = null;
-
+    public User checkLogin(UserRequest user) {
         if (Objects.nonNull(user.getUsername())) {
-            account = userRepository.findUserByUsername(user.getUsername());
+            User account = userRepository.findUserByUsername(user.getUsername());
+
+            if (Objects.nonNull(account) && Objects.equals(user.getPassword(), account.getPassword()))
+                return account;
         }
 
-        return Objects.nonNull(account) && Objects.equals(user.getPassword(), account.getPassword());
+        return null;
     }
 }

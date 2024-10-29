@@ -2,6 +2,7 @@ package math.server.service.utils;
 
 import math.server.controller.ClientHandler;
 import math.server.model.Room;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,8 @@ import org.slf4j.LoggerFactory;
 public class UserSession {
 
     private static final Logger log = LoggerFactory.getLogger(UserSession.class);
-    private final String userID;
+    private final String clientID;
+    private Integer userID;
     private String username;
     private Boolean loginState;
     private Integer currentPoint;
@@ -22,13 +24,21 @@ public class UserSession {
     private Room currentRoom;
     private ClientHandler clientHandler;
 
-    public UserSession(String userID) {
-        this.userID = userID;
-        log.info("Create new session for client: {}", userID);
+    public UserSession(String clientID) {
+        this.clientID = clientID;
+        log.info("Create new session for client: {}", clientID);
     }
 
-    public String getUserID() {
+    public Integer getUserID() {
         return userID;
+    }
+
+    public void setUserID(Integer userID) {
+        this.userID = userID;
+    }
+
+    public String getClientID() {
+        return clientID;
     }
 
     public String getUsername() {

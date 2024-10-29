@@ -1,14 +1,15 @@
 package math.server.controller;
 
 import com.google.gson.Gson;
+
 import math.server.common.Common;
 import math.server.common.Constants;
 import math.server.dto.request.BaseRequest;
 import math.server.dto.response.BaseResponse;
-import math.server.model.Room;
 import math.server.router.Router;
 import math.server.service.utils.SessionManager;
 import math.server.service.utils.UserSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +17,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+
 import java.net.Socket;
 import java.net.SocketException;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -113,21 +116,6 @@ public class ClientHandler implements Runnable {
     public void sendMessage(String message) {
         log.info("Send message for: {}", clientID);
         responseWriter.println(message);
-    }
-
-    public void sendMessageForRoom(String message, String roomID) {
-        Room room = sessionManager.getRoom(roomID, false);
-
-        if (Objects.nonNull(room)) {
-            Map<String, UserSession> userSessionMap = room.getAllUsers();
-
-            userSessionMap.forEach((userID, userSession) -> {
-                if (!userSession.getUserID().equals(session.getUserID()))
-                    userSession.getClientHandler().sendMessage(message);
-            });
-        } else {
-            log.error("Room is null. Cannot send message for users in room.");
-        }
     }
 
     public void closeConnection() {

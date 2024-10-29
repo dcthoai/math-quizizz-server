@@ -14,9 +14,9 @@ public class Room {
 
     private static final Logger log = LoggerFactory.getLogger(Room.class);
     private final String roomID;
-    private Boolean isPlayingGame = false;
     private final Map<String, UserSession> users;
     private final Map<String, Integer> ranking;
+    private Boolean isPlayingGame = false;
 
     public Room(String roomID) {
         this.roomID = roomID;
@@ -29,7 +29,7 @@ public class Room {
         return roomID;
     }
 
-    public Map<String, UserSession> getAllUsers() {
+    public Map<String, UserSession> getUsers() {
         return users;
     }
 

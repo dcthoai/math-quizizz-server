@@ -4,14 +4,20 @@ import java.util.List;
 
 public class RoomDTO {
 
-    private final String roomID;
+    private String roomID;
     private Boolean isPlayingGame;
     private List<String> users;
+
+    public RoomDTO() {}
 
     public RoomDTO(String roomID, Boolean isPlayingGame, List<String> users) {
         this.roomID = roomID;
         this.isPlayingGame = isPlayingGame;
         this.users = users;
+    }
+
+    public void setRoomID(String roomID) {
+        this.roomID = roomID;
     }
 
     public String getRoomID() {

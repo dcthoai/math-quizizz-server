@@ -11,5 +11,5 @@ public interface IUserService {
 
     User findUserByUsername(String username);
 
-    boolean checkLogin(UserRequest user);
+    User checkLogin(UserRequest user);
 }

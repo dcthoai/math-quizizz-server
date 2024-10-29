@@ -32,6 +32,9 @@ public class DataSourceProvider {
         config.setMaxLifetime(Constants.CONNECTION_LIFETIME); // Maximum time of a connection
         config.setConnectionTimeout(Constants.CONNECTION_TIMEOUT); // Time to wait for a connection
 
+        config.setKeepaliveTime(Constants.CONNECTION_KEEP_ALIVE_TIME); // Connection keep alive time (5 minutes)
+        config.setConnectionTestQuery("SELECT 1");
+
         dataSource = new HikariDataSource(config);
         log.info("Configuration data source for application successfully");
     }

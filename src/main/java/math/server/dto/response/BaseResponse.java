@@ -22,13 +22,13 @@ public class BaseResponse {
     }
 
     public BaseResponse(String action, Object result) {
+        Gson gson = new Gson();
         this.code = Constants.SUCCESS;
         this.status = true;
         this.message = "Success";
         this.action = action;
-        this.result = new Gson().toJson(result);
+        this.result = gson.toJson(result);
     }
-
 
     public BaseResponse(Integer code, Boolean status) {
         this.code = code;

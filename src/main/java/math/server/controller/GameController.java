@@ -31,13 +31,13 @@ public class GameController implements RouterMapping {
     @SuppressWarnings("unused")
     public BaseResponse startGame(UserSession session, BaseRequest request) {
         session.setCurrentRoom(new Room(Common.generateUniqueID(SessionManager.getUniqueIDs(), 5)));
-        session.getCurrentRoom().addUserToRoom(session.getUserID(), session);
+        session.getCurrentRoom().addUserToRoom(session.getClientID(), session);
         Room room = session.getCurrentRoom();
 
         if (Objects.nonNull(room) && room.isEmpty())
             return new BaseResponse(Constants.BAD_REQUEST, false, "/game/start", "Not found room or empty room");
 
-        Map<String, UserSession> userSessionMap = room.getAllUsers();
+        Map<String, UserSession> userSessionMap = room.getUsers();
         List<UserSession> userSessions = new ArrayList<>(userSessionMap.values());
 
         scheduledTasksService.setInterval(() -> playGame(userSessions), Constants.INTERVAL_TASK + room.getRoomID(), Constants.QUESTION_TIMEOUT);

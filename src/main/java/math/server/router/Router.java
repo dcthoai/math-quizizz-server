@@ -87,7 +87,7 @@ public class Router implements Runnable {
                 Object controllerInstance = method.getDeclaringClass().getDeclaredConstructor().newInstance();
                 return method.invoke(controllerInstance, session, request);
             } catch (Exception e) {
-                log.error("Failed to handle request", e);
+                log.error("Failed to handle request: {}", request.getEndPoint(), e);
                 return new BaseResponse(Constants.INTERNAL_SERVER_ERROR, false, request.getAction(), e.getMessage());
             }
         } else {

@@ -32,21 +32,31 @@ public class RoomController implements RouterMapping {
         return new BaseResponse(Constants.NO_ACTION, rooms);
     }
 
-    @EndPoint("/available")
+    @EndPoint("/list")
     public BaseResponse getAvailableRooms(UserSession session, BaseRequest request) {
-        List<Room> rooms = sessionManager.getRooms(true);
-        return new BaseResponse(Constants.NO_ACTION, rooms);
+        List<Room> rooms = sessionManager.getRooms(false);
+        List<RoomDTO> roomDTOS = new ArrayList<>();
+
+        rooms.forEach(room -> {
+            List<UserSession> sessions = new ArrayList<>(room.getUsers().values());
+            List<String> users = sessions.stream().map(UserSession::getUsername).collect(Collectors.toList());
+            RoomDTO roomDTO = new RoomDTO(room.getRoomID(), room.isPlayingGame(), users);
+
+            roomDTOS.add(roomDTO);
+        });
+
+        return new BaseResponse(Constants.NO_ACTION, roomDTOS);
     }
 
     @EndPoint("/new")
     public BaseResponse createRoom(UserSession session, BaseRequest request) {
         Room room = sessionManager.getRoom(null, true);  // Create new room
         session.setCurrentRoom(room);
+        room.addUserToRoom(session.getClientID(), session);
 
-//        List<UserSession> sessions = new ArrayList<>(room.getAllUsers().values());
-//        List<String> users = sessions.stream().map(UserSession::getUsername).collect(Collectors.toList());
+        List<UserSession> sessions = new ArrayList<>(room.getUsers().values());
+        List<String> users = sessions.stream().map(UserSession::getUsername).collect(Collectors.toList());
 
-        List<String> users = List.of("ansd", "skfnns", "thoai");
         RoomDTO roomDTO = new RoomDTO(room.getRoomID(), false, users);
 
         return new BaseResponse(Constants.NO_ACTION, roomDTO);
@@ -68,10 +78,10 @@ public class RoomController implements RouterMapping {
         Room room = sessionManager.getRoom(roomID, false);
 
         if (Objects.nonNull(room)) {
-            boolean isSuccess = room.addUserToRoom(session.getUserID(), session);
+            session.setCurrentRoom(room);
+            boolean isSuccess = room.addUserToRoom(session.getClientID(), session);
 
             if (isSuccess) {
-                session.setCurrentRoom(room);
                 return new BaseResponse(Constants.NO_ACTION, room);
             }
 
@@ -87,7 +97,7 @@ public class RoomController implements RouterMapping {
 
         if (Objects.nonNull(room)) {
             session.setCurrentRoom(null);
-            boolean isSuccess = room.removeUser(session.getUserID());
+            boolean isSuccess = room.removeUser(session.getClientID());
 
             if (room.isEmpty())
                 sessionManager.removeRoom(room.getRoomID());

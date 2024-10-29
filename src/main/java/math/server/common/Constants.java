@@ -10,11 +10,12 @@ public interface Constants {
     String DATABASE_USER = "admin-math";
     String DATABASE_KEY = "1234";
 
-    Integer MAX_CONNECTION = 10;
-    Integer MIN_CONNECTION_IDLE = 2;
-    Long CONNECTION_IDLE_TIMEOUT = 30 * 1000L; // 30 seconds
+    Integer MAX_CONNECTION = 15;
+    Integer MIN_CONNECTION_IDLE = 5;
+    Long CONNECTION_IDLE_TIMEOUT = 5 * 60 * 1000L; // 5 minutes
     Long CONNECTION_TIMEOUT = 30 * 1000L; // 30 seconds
-    Long CONNECTION_LIFETIME = 5 * 60 * 1000L; // 5 minutes
+    Long CONNECTION_LIFETIME = 20 * 60 * 1000L; // 20 minutes
+    Long CONNECTION_KEEP_ALIVE_TIME = 5 * 60 * 1000L; // 5 minutes
 
     String CONTROLLER_PACKAGE = "math.server.controller";
     String SOCKET_CLOSE = "EXIT";
