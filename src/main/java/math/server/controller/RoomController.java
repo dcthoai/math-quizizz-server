@@ -4,19 +4,17 @@ import com.google.gson.Gson;
 import math.server.common.Constants;
 import math.server.dto.request.BaseRequest;
 import math.server.dto.response.BaseResponse;
-import math.server.dto.response.RoomDTO;
 import math.server.model.Room;
 import math.server.router.EndPoint;
 import math.server.router.RouterMapping;
 import math.server.service.utils.SessionManager;
 import math.server.service.utils.UserSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @EndPoint("/api/room")
 @SuppressWarnings("unused")
@@ -29,66 +27,58 @@ public class RoomController implements RouterMapping {
     @EndPoint()
     public BaseResponse getRooms(UserSession session, BaseRequest request) {
         List<Room> rooms = sessionManager.getRooms(false);
-        return new BaseResponse(Constants.NO_ACTION, rooms);
+        return new BaseResponse(request.getAction(), rooms);
     }
 
-    @EndPoint("/list")
+    @EndPoint("/available")
     public BaseResponse getAvailableRooms(UserSession session, BaseRequest request) {
-        List<Room> rooms = sessionManager.getRooms(false);
-        List<RoomDTO> roomDTOS = new ArrayList<>();
-
-        rooms.forEach(room -> {
-            List<UserSession> sessions = new ArrayList<>(room.getUsers().values());
-            List<String> users = sessions.stream().map(UserSession::getUsername).collect(Collectors.toList());
-            RoomDTO roomDTO = new RoomDTO(room.getRoomID(), room.isPlayingGame(), users);
-
-            roomDTOS.add(roomDTO);
-        });
-
-        return new BaseResponse(Constants.NO_ACTION, roomDTOS);
+        List<Room> rooms = sessionManager.getRooms(true);
+        return new BaseResponse(request.getAction(), Room.getRoomDTOs(rooms));
     }
 
     @EndPoint("/new")
     public BaseResponse createRoom(UserSession session, BaseRequest request) {
-        Room room = sessionManager.getRoom(null, true);  // Create new room
-        session.setCurrentRoom(room);
-        room.addUserToRoom(session.getClientID(), session);
+        Room room = session.getCurrentRoom();
 
-        List<UserSession> sessions = new ArrayList<>(room.getUsers().values());
-        List<String> users = sessions.stream().map(UserSession::getUsername).collect(Collectors.toList());
+        if (Objects.isNull(room)) {
+            room = sessionManager.getRoom(null, true);  // Create new room if user has no rooms available
+            room.addUserToRoom(session.getClientID(), session);
+            session.setCurrentRoom(room);
+        }
 
-        RoomDTO roomDTO = new RoomDTO(room.getRoomID(), false, users);
+        // Update list rooms for all online users
+        sessionManager.notifyChangeRoomsData();
 
-        return new BaseResponse(Constants.NO_ACTION, roomDTO);
+        return new BaseResponse(request.getAction(), Room.getRoomDTO(room));
     }
 
     @EndPoint("/find")
-    public BaseResponse findRoom(UserSession session, String roomID) {
-        Room room = sessionManager.getRoom(roomID, false);
+    public BaseResponse findRoom(UserSession session, BaseRequest request) {
+        Room room = sessionManager.getRoom(request.getRequest(), false);
 
         if (Objects.nonNull(room)) {
-            return new BaseResponse(Constants.NO_ACTION, room);
+            return new BaseResponse(request.getAction(), room.getRoomID());
         }
 
-        return new BaseResponse(Constants.BAD_REQUEST, false, "/room/find", "Not found room with ID " + roomID);
+        return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "Not found room with ID: " + request.getRequest());
     }
 
     @EndPoint("/join")
-    public BaseResponse joinRoom(UserSession session, String roomID) {
-        Room room = sessionManager.getRoom(roomID, false);
+    public BaseResponse joinRoom(UserSession session, BaseRequest request) {
+        Room room = sessionManager.getRoom(request.getRequest(), false);
 
         if (Objects.nonNull(room)) {
-            session.setCurrentRoom(room);
             boolean isSuccess = room.addUserToRoom(session.getClientID(), session);
 
             if (isSuccess) {
-                return new BaseResponse(Constants.NO_ACTION, room);
+                session.setCurrentRoom(room);
+                return new BaseResponse(request.getAction(), Constants.NO_CONTENT);
             }
 
-            return new BaseResponse(Constants.BAD_REQUEST, false, "/room/join", "Room is full or missing user info!");
+            return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "Room is full or missing user info!");
         }
 
-        return new BaseResponse(Constants.BAD_REQUEST, false, "/room/join", "Not found room with ID: " + roomID);
+        return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "Not found room with ID: " + request.getRequest());
     }
 
     @EndPoint("/exit")
@@ -99,12 +89,12 @@ public class RoomController implements RouterMapping {
             session.setCurrentRoom(null);
             boolean isSuccess = room.removeUser(session.getClientID());
 
-            if (room.isEmpty())
-                sessionManager.removeRoom(room.getRoomID());
+            // Notify change list rooms for all online users
+            sessionManager.notifyChangeRoomsData();
 
-            return new BaseResponse(Constants.SUCCESS, isSuccess, "/room/exit");
+            return new BaseResponse(Constants.SUCCESS, isSuccess, request.getAction());
         }
 
-        return new BaseResponse(Constants.BAD_REQUEST, false, "/room/exit", "You don't in which the room");
+        return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "You are not in this room");
     }
 }

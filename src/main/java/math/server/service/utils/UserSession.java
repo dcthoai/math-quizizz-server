@@ -6,6 +6,8 @@ import math.server.model.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 /**
  * Session of a specific user. <p>
  * Contains information about the user, login status, game information and handler to handle socket communication.
@@ -27,6 +29,16 @@ public class UserSession {
     public UserSession(String clientID) {
         this.clientID = clientID;
         log.info("Create new session for client: {}", clientID);
+    }
+
+    public void invalidSession() {
+        loginState = false;
+
+        if (Objects.nonNull(currentRoom)) {
+            currentRoom.removeUser(clientID);
+        }
+
+        SessionManager.getInstance().invalidSession(clientID);
     }
 
     public Integer getUserID() {

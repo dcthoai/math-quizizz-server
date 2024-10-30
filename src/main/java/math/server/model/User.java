@@ -1,5 +1,8 @@
 package math.server.model;
 
+import math.server.dto.response.UserDTO;
+import math.server.service.utils.UserSession;
+
 public class User {
 
     private Integer ID, gamesPlayed, score, rank;
@@ -11,6 +14,23 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public static UserDTO getUserDTO(UserSession session, User user) {
+        UserDTO userDTO = new UserDTO();
+
+        userDTO.setID(user.getID());
+        userDTO.setUsername(user.getUsername());
+        userDTO.setRank(user.getRank());
+        userDTO.setScore(user.getScore());
+        userDTO.setGamesPlayed(user.getGamesPlayed());
+        userDTO.setWinRate(user.getWinRate());
+
+        userDTO.setCurrentPoint(session.getCurrentPoint());
+        userDTO.setCurrentRank(session.getCurrentRank());
+        userDTO.setLoginStatus(true);
+
+        return userDTO;
     }
 
     public Integer getID() {

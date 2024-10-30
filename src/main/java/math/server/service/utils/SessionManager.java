@@ -1,7 +1,12 @@
 package math.server.service.utils;
 
+import com.google.gson.Gson;
+
 import math.server.common.Common;
+import math.server.common.Constants;
+import math.server.dto.response.BaseResponse;
 import math.server.model.Room;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +30,7 @@ public class SessionManager implements Runnable {
     private static final Map<String, Room> rooms = new HashMap<>();
     private static final Map<String, UserSession> sessions = new HashMap<>();
     private static final SessionManager instance = new SessionManager();
+    private static final Gson gson = new Gson();
 
     private SessionManager() {}
 
@@ -34,6 +40,23 @@ public class SessionManager implements Runnable {
 
     public static Set<String> getUniqueIDs() {
         return uniqueIDs;
+    }
+
+    public void notifyChangeRoomsData() {
+        // Notify change list rooms for all online users
+        List<Room> rooms = instance.getRooms(false);
+        instance.notifyAll(new BaseResponse("/room/update", Room.getRoomDTOs(rooms)));
+    }
+
+    public void notifyAll(BaseResponse response) {
+        try {
+            String responseJSON = gson.toJson(response);
+
+            // Send message for all online users
+            sessions.values().forEach(session -> session.getClientHandler().sendMessage(responseJSON));
+        } catch (Exception e) {
+            log.error("Cannot send notification for all users: ", e);
+        }
     }
 
     public Room getRoom(String roomID, Boolean createRoom) {
@@ -59,15 +82,10 @@ public class SessionManager implements Runnable {
     }
 
     public void removeRoom(String roomID) {
-        if (Objects.nonNull(roomID))
+        if (Objects.nonNull(roomID)) {
             rooms.remove(roomID);
-    }
-
-    public UserSession getSession() {
-        String userID = Common.generateUniqueID(uniqueIDs, 6);
-        UserSession userSession = new UserSession(userID);
-        sessions.put(userID, userSession);
-        return userSession;
+            notifyChangeRoomsData();
+        }
     }
 
     public UserSession getSession(String userID) {
@@ -85,7 +103,7 @@ public class SessionManager implements Runnable {
 
     public UserSession getSession(String username, Boolean createSession) {
         UserSession userSession = sessions.values().stream()
-                .filter(session -> session.getUsername().equals(username))
+                .filter(session -> Objects.equals(session.getUsername(), username))
                 .findFirst()
                 .orElse(null);
 

@@ -40,14 +40,14 @@ public class GameController implements RouterMapping {
         Map<String, UserSession> userSessionMap = room.getUsers();
         List<UserSession> userSessions = new ArrayList<>(userSessionMap.values());
 
-        scheduledTasksService.setInterval(() -> playGame(userSessions), Constants.INTERVAL_TASK + room.getRoomID(), Constants.QUESTION_TIMEOUT);
+        scheduledTasksService.setInterval(() -> playGame(userSessions, request), Constants.INTERVAL_TASK + room.getRoomID(), Constants.QUESTION_TIMEOUT);
         scheduledTasksService.setTimeout(() -> finishGame(userSessions, room.getRoomID()), Constants.TIMEOUT_TASK + room.getRoomID(), Constants.GAME_TIMEOUT);
 
-        return new BaseResponse(Constants.SUCCESS, true, Constants.NO_ACTION, "Playing, let choose answer", "Game over");
+        return new BaseResponse(Constants.SUCCESS, true, request.getAction(), "Playing, let choose answer", "Game over");
     }
 
-    private void playGame(List<UserSession> userSessions) {
-        sendMessageToRoom(userSessions, new BaseResponse(Constants.SUCCESS, true, "/game/question", "Playing, let choose answer", "Playing, let choose answer"));
+    private void playGame(List<UserSession> userSessions, BaseRequest request) {
+        sendMessageToRoom(userSessions, new BaseResponse(Constants.SUCCESS, true, request.getAction(), "Playing, let choose answer", "Playing, let choose answer"));
     }
 
     private void finishGame(List<UserSession> userSessions, String UID) {

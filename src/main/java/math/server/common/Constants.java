@@ -22,6 +22,7 @@ public interface Constants {
     Integer SERVER_PORT = 8888;
 
     String NO_ACTION = "NO_ACTION";
+    String NO_CONTENT = "NO_CONTENT";
     Integer SUCCESS = 200;
     Integer BAD_REQUEST = 400;
     Integer UNAUTHORIZED = 401;

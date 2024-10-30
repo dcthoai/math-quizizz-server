@@ -28,6 +28,7 @@ import java.util.Objects;
 public class UserController implements RouterMapping {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final SessionManager sessionManager = SessionManager.getInstance();
     private final UserService userService;
 
     public UserController() {
@@ -42,8 +43,8 @@ public class UserController implements RouterMapping {
             User user = userService.findUserById(session.getUserID());
 
             if (Objects.nonNull(user)) {
-                UserDTO userDTO = getUserDTO(session, user);
-                return new BaseResponse(Constants.NO_ACTION, userDTO);
+                UserDTO userDTO = User.getUserDTO(session, user);
+                return new BaseResponse(request.getAction(), userDTO);
             }
 
             return new BaseResponse(Constants.SUCCESS, false, request.getAction(), "Could found user with ID: " + session.getUserID());
@@ -51,21 +52,6 @@ public class UserController implements RouterMapping {
             log.error("Failed to get user info", e);
             return new BaseResponse(Constants.INTERNAL_SERVER_ERROR, false, request.getAction(), "Cannot get user info");
         }
-    }
-
-    private UserDTO getUserDTO(UserSession session, User user) {
-        UserDTO userDTO = new UserDTO();
-
-        userDTO.setID(user.getID());
-        userDTO.setUsername(user.getUsername());
-        userDTO.setCurrentPoint(session.getCurrentPoint());
-        userDTO.setCurrentRank(session.getCurrentRank());
-        userDTO.setRank(user.getRank());
-        userDTO.setScore(user.getScore());
-        userDTO.setGamesPlayed(user.getGamesPlayed());
-        userDTO.setWinRate(user.getWinRate());
-        userDTO.setLoginStatus(true);
-        return userDTO;
     }
 
     @EndPoint("/register")
@@ -100,6 +86,12 @@ public class UserController implements RouterMapping {
         try {
             Gson gson = new Gson();
             UserRequest userRequest = gson.fromJson(request.getRequest(), UserRequest.class);
+            UserSession userSession = sessionManager.getSession(userRequest.getUsername(), false);
+
+            if (Objects.nonNull(userSession) && userSession.getLoginState()) {
+                return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "Account is logged in elsewhere");
+            }
+
             User account = userService.checkLogin(userRequest);
 
             if (Objects.nonNull(account)) {
@@ -123,7 +115,7 @@ public class UserController implements RouterMapping {
         log.debug("Socket request to logout. EndPoint: /api/user/logout");
 
         if (Objects.nonNull(session)) {
-            SessionManager.getInstance().invalidSession(session.getClientID());
+            session.invalidSession();
             return new BaseResponse(Constants.SUCCESS, true, request.getAction(), "Logout successfully!");
         }
 
