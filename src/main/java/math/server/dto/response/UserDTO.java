@@ -9,6 +9,7 @@ public class UserDTO {
 
     public UserDTO() {}
 
+    @SuppressWarnings("unused")
     public Integer getID() {
         return ID;
     }
@@ -17,6 +18,7 @@ public class UserDTO {
         this.ID = ID;
     }
 
+    @SuppressWarnings("unused")
     public Integer getGamesPlayed() {
         return gamesPlayed;
     }
@@ -25,6 +27,7 @@ public class UserDTO {
         this.gamesPlayed = gamesPlayed;
     }
 
+    @SuppressWarnings("unused")
     public Integer getScore() {
         return score;
     }
@@ -33,6 +36,7 @@ public class UserDTO {
         this.score = score;
     }
 
+    @SuppressWarnings("unused")
     public Integer getRank() {
         return rank;
     }
@@ -41,6 +45,7 @@ public class UserDTO {
         this.rank = rank;
     }
 
+    @SuppressWarnings("unused")
     public Integer getCurrentPoint() {
         return currentPoint;
     }
@@ -49,6 +54,7 @@ public class UserDTO {
         this.currentPoint = currentPoint;
     }
 
+    @SuppressWarnings("unused")
     public Integer getCurrentRank() {
         return currentRank;
     }
@@ -57,6 +63,7 @@ public class UserDTO {
         this.currentRank = currentRank;
     }
 
+    @SuppressWarnings("unused")
     public Float getWinRate() {
         return winRate;
     }
@@ -65,6 +72,7 @@ public class UserDTO {
         this.winRate = winRate;
     }
 
+    @SuppressWarnings("unused")
     public Boolean getLoginStatus() {
         return loginStatus;
     }
@@ -73,6 +81,7 @@ public class UserDTO {
         this.loginStatus = loginStatus;
     }
 
+    @SuppressWarnings("unused")
     public String getUsername() {
         return username;
     }

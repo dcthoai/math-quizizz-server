@@ -3,7 +3,6 @@ package math.server.service.utils;
 import com.google.gson.Gson;
 
 import math.server.common.Common;
-import math.server.common.Constants;
 import math.server.dto.response.BaseResponse;
 import math.server.model.Room;
 
@@ -124,6 +123,6 @@ public class SessionManager implements Runnable {
 
     @Override
     public void run() {
-        log.info("Initialize session manager successfully. Number of users online: {}", getInstance().sessions.size());
+        log.info("Initialize session manager successfully. Number of users online: {}", sessions.size());
     }
 }

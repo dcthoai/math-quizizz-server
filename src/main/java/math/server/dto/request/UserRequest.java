@@ -11,6 +11,7 @@ public class UserRequest {
         return username;
     }
 
+    @SuppressWarnings("unused")
     public void setUsername(String username) {
         this.username = username;
     }
@@ -19,6 +20,7 @@ public class UserRequest {
         return password;
     }
 
+    @SuppressWarnings("unused")
     public void setPassword(String password) {
         this.password = password;
     }

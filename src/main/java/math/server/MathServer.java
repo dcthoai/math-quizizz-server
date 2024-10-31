@@ -29,12 +29,11 @@ public class MathServer {
         SessionManager.getInstance().run();
         ScheduledTasksService.getInstance().run();
 
-        log.info("Application is running");
-        log.info(
-                "\n----------------------------------------------------------\n\t" +
-                        "Application '{}' is running!  Access URLs:\n\t" +
-                        "Local: \t\tws://localhost:{}\n\t" +
-                        "\n----------------------------------------------------------",
+        log.info("Application is running" +
+                "\n----------------------------------------------------------\n" +
+                        "\tApplication '{}' is running!  Access URLs:\n" +
+                        "\tLocal: \t\tws://localhost:{}\n" +
+                "\n----------------------------------------------------------\n",
                 MathServer.class.getSimpleName(),
                 Constants.SERVER_PORT
         );

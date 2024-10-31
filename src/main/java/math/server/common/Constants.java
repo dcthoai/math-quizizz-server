@@ -10,12 +10,10 @@ public interface Constants {
     String DATABASE_USER = "admin-math";
     String DATABASE_KEY = "1234";
 
-    Integer MAX_CONNECTION = 15;
-    Integer MIN_CONNECTION_IDLE = 5;
-    Long CONNECTION_IDLE_TIMEOUT = 5 * 60 * 1000L; // 5 minutes
+    Integer MAX_CONNECTION = 10;
+    Long CONNECTION_IDLE_TIMEOUT = 10 * 60 * 1000L; // 10 minutes
     Long CONNECTION_TIMEOUT = 30 * 1000L; // 30 seconds
-    Long CONNECTION_LIFETIME = 20 * 60 * 1000L; // 20 minutes
-    Long CONNECTION_KEEP_ALIVE_TIME = 5 * 60 * 1000L; // 5 minutes
+    Long CONNECTION_LIFETIME = 30 * 60 * 1000L; // 30 minutes
 
     String CONTROLLER_PACKAGE = "math.server.controller";
     String SOCKET_CLOSE = "EXIT";
@@ -36,8 +34,9 @@ public interface Constants {
     Integer SOCKET_INVALID_DATA = 4000;
     Integer UNKNOWN_SOCKET_SERVER = 5000;
 
+    Integer QUESTION_POINT = 1000;
     Long QUESTION_TIMEOUT = 5 * 1000L; // 30 seconds
-    Long GAME_TIMEOUT = 1 * 30 * 1000L; // 5 minutes equivalent to 10 question
+    Long GAME_TIMEOUT = 2 * 30 * 1000L; // 5 minutes equivalent to 10 question
     String TIMEOUT_TASK = "TIMEOUT_";
     String INTERVAL_TASK = "INTERVAL_";
 

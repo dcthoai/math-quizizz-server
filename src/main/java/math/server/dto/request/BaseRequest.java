@@ -10,6 +10,7 @@ public class BaseRequest {
         return endPoint;
     }
 
+    @SuppressWarnings("unused")
     public void setEndPoint(String endPoint) {
         this.endPoint = endPoint;
     }
@@ -18,6 +19,7 @@ public class BaseRequest {
         return request;
     }
 
+    @SuppressWarnings("unused")
     public void setRequest(String request) {
         this.request = request;
     }

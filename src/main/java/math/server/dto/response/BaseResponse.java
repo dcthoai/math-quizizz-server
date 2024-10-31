@@ -33,12 +33,16 @@ public class BaseResponse {
     public BaseResponse(Integer code, Boolean status) {
         this.code = code;
         this.status = status;
+        this.message = Constants.NO_CONTENT;
+        this.result = Constants.NO_CONTENT;
     }
 
     public BaseResponse(Integer code, Boolean status, String action) {
         this.code = code;
         this.status = status;
         this.action = action;
+        this.message = Constants.NO_CONTENT;
+        this.result = Constants.NO_CONTENT;
     }
 
     public BaseResponse(Integer code, Boolean status, String action, String message) {
@@ -46,6 +50,7 @@ public class BaseResponse {
         this.status = status;
         this.message = message;
         this.action = action;
+        this.result = Constants.NO_CONTENT;
     }
 
     public BaseResponse(Integer code, Boolean status, String action, String message, String result) {

@@ -3,6 +3,7 @@ package math.server.repository.utils;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public interface IEntityManager<T> {
 
     List<T> query(Class<T> entityName, String sql, List<Object> params);

@@ -20,10 +20,10 @@ public class UserSession {
     private Integer userID;
     private String username;
     private Boolean loginState;
-    private Integer currentPoint;
-    private Integer currentRank;
-    private Integer correctAnswers;
-    private Room currentRoom;
+    private Integer currentPoint = 0;
+    private Integer currentRank = 0;
+    private Integer correctAnswers = 0;
+    private String currentRoom;
     private ClientHandler clientHandler;
 
     public UserSession(String clientID) {
@@ -31,11 +31,29 @@ public class UserSession {
         log.info("Create new session for client: {}", clientID);
     }
 
+    public void updateCorrectAnswers() {
+        correctAnswers += 1;
+    }
+
+    public void resetGameValue() {
+        currentPoint = 0;
+        currentRank = 0;
+        correctAnswers = 0;
+        currentRoom = null;
+    }
+
+    public void notify(String response) {
+        clientHandler.sendMessage(response);
+    }
+
     public void invalidSession() {
         loginState = false;
 
         if (Objects.nonNull(currentRoom)) {
-            currentRoom.removeUser(clientID);
+            Room room = SessionManager.getInstance().getRoom(currentRoom, false);
+
+            if (Objects.nonNull(room))
+                room.removeUser(clientID);
         }
 
         SessionManager.getInstance().invalidSession(clientID);
@@ -77,11 +95,11 @@ public class UserSession {
         this.currentPoint = currentPoint;
     }
 
-    public Room getCurrentRoom() {
+    public String getCurrentRoom() {
         return currentRoom;
     }
 
-    public void setCurrentRoom(Room currentRoom) {
+    public void setCurrentRoom(String currentRoom) {
         this.currentRoom = currentRoom;
     }
 

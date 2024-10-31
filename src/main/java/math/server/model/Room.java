@@ -1,7 +1,7 @@
 package math.server.model;
 
 import com.google.gson.Gson;
-import math.server.controller.ClientHandler;
+import math.server.common.Constants;
 import math.server.dto.response.BaseResponse;
 import math.server.dto.response.RoomDTO;
 import math.server.service.utils.SessionManager;
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -22,13 +23,13 @@ public class Room {
     private final Gson gson = new Gson();
     private final String roomID;
     private final Map<String, UserSession> users;
-    private final Map<String, Integer> ranking;
+    private Map<String, Integer> ranking;
     private Boolean isPlayingGame = false;
 
     public Room(String roomID) {
         this.roomID = roomID;
         this.users = new HashMap<>();
-        this.ranking = new HashMap<>();
+        this.ranking = new LinkedHashMap<>();
         log.info("Created new room: {}", roomID);
     }
 
@@ -40,23 +41,15 @@ public class Room {
         return users;
     }
 
-    public ClientHandler getUser(String clientID) {
-        if (Objects.nonNull(clientID) && users.containsKey(clientID))
-            return users.get(clientID).getClientHandler();
-
-        return null;
-    }
-
     public boolean addUserToRoom(String clientID, UserSession userSession) {
+        if (isFull() || isPlayingGame())
+            return false;
+
         if (Objects.nonNull(clientID) && Objects.nonNull(userSession)) {
-            if (users.size() < 5) {
-                users.put(clientID, userSession);
-                updateRoomData();
-                return true;
-            } else {
-                log.error("This room is full!");
-                return false;
-            }
+            users.put(clientID, userSession);
+            ranking.put(userSession.getUsername(), 0); // Init user rank with current point = 0
+            updateRoomData();
+            return true;
         }
 
         log.error("User ID is null or not found method to execute this user!");
@@ -73,7 +66,7 @@ public class Room {
             users.remove(clientID);
             updateRoomData();
 
-            if (users.isEmpty()) {
+            if (isEmpty()) {
                 SessionManager.getInstance().removeRoom(roomID);
             }
 
@@ -114,17 +107,49 @@ public class Room {
     }
 
     public boolean isFull() {
-        return users.size() < 5;
+        return users.size() > 5;
+    }
+
+    public void updateUserPoint(String username) {
+        if (Objects.nonNull(username) && ranking.containsKey(username)) {
+            Integer currentPoint = ranking.get(username);
+            ranking.put(username, currentPoint + Constants.QUESTION_POINT);
+
+            // Sort by value descending
+            ranking = ranking.entrySet()
+                    .stream()
+                    .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (e1, e2) -> e1, // Update value for the key if the key already exists
+                            LinkedHashMap::new
+                    ));
+        }
+    }
+
+    public Integer getUserPoint(String username) {
+        if (Objects.nonNull(username) && ranking.containsKey(username)) {
+            return ranking.get(username);
+        }
+
+        return 0;
+    }
+
+    public Integer getUserRank(String username) {
+        int rank = 1;
+
+        for (Map.Entry<String, Integer> entry : ranking.entrySet()) {
+            if (username.equals(entry.getKey()))
+                return rank;
+            rank++;
+        }
+
+        return 0;
     }
 
     public Map<String, Integer> getRanking() {
         return ranking;
-    }
-
-    public void updateRanking(List<User> users) {
-        users.forEach(user -> {
-            ranking.put(user.getUsername(), user.getScore());
-        });
     }
 
     public Boolean isPlayingGame() {

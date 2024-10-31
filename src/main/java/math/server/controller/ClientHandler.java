@@ -21,7 +21,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -82,8 +81,16 @@ public class ClientHandler implements Runnable {
                 // Use router to process request
                 BaseResponse response = (BaseResponse) router.handleRequest(session, request);
 
+                if (Objects.isNull(response)) {
+                    log.warn("No response for request: {}, {}", request.getEndPoint(), jsonRequest);
+                    continue;
+                }
+
+                String responseJSON = gson.toJson(response);
+                log.debug("Response for clientID: {}, message: {}", clientID, responseJSON);
+
                 // Response for client
-                responseWriter.println(gson.toJson(response));
+                responseWriter.println(responseJSON);
             } catch (SocketException e) {
                 log.error("Socket connection error. Client might be disconnected", e);
                 closeConnection();
@@ -114,7 +121,7 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendMessage(String message) {
-        log.info("Send message for: {}", clientID);
+        log.info("Send message for: {}, message: {}", clientID, message);
         responseWriter.println(message);
     }
 
