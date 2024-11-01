@@ -1,8 +1,12 @@
-package math.server.model;
+package math.server.entity;
 
+import math.server.repository.utils.Entity;
+
+@Entity(value = "player")
+@SuppressWarnings("unused")
 public class Player {
 
-    private Integer ID, gameID, rank, score;
+    private Integer ID, gameID, userID, rank, score;
 
     public Player() {}
 
@@ -36,5 +40,13 @@ public class Player {
 
     public void setScore(Integer score) {
         this.score = score;
+    }
+
+    public Integer getUserID() {
+        return userID;
+    }
+
+    public void setUserID(Integer userID) {
+        this.userID = userID;
     }
 }

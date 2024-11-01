@@ -4,6 +4,7 @@ package math.server.common;
  * All configuration constants and parameters used for the application
  * @author dcthoai
  */
+@SuppressWarnings("unused")
 public interface Constants {
 
     String DATABASE_HOST = "jdbc:mysql://localhost:3306/math?useSSL=true&requireSSL=false";
@@ -11,9 +12,10 @@ public interface Constants {
     String DATABASE_KEY = "1234";
 
     Integer MAX_CONNECTION = 10;
-    Long CONNECTION_IDLE_TIMEOUT = 10 * 60 * 1000L; // 10 minutes
+    Integer MIN_CONNECTION_IDLE = 4;
+    Long CONNECTION_IDLE_TIMEOUT = 3 * 60 * 1000L; // 3 minutes
     Long CONNECTION_TIMEOUT = 30 * 1000L; // 30 seconds
-    Long CONNECTION_LIFETIME = 30 * 60 * 1000L; // 30 minutes
+    Long CONNECTION_LIFETIME = 10 * 60 * 1000L; // 10 minutes
 
     String CONTROLLER_PACKAGE = "math.server.controller";
     String SOCKET_CLOSE = "EXIT";
@@ -35,7 +37,7 @@ public interface Constants {
     Integer UNKNOWN_SOCKET_SERVER = 5000;
 
     Integer QUESTION_POINT = 1000;
-    Long QUESTION_TIMEOUT = 5 * 1000L; // 30 seconds
+    Long QUESTION_TIMEOUT = 30 * 1000L; // 30 seconds
     Long GAME_TIMEOUT = 2 * 30 * 1000L; // 5 minutes equivalent to 10 question
     String TIMEOUT_TASK = "TIMEOUT_";
     String INTERVAL_TASK = "INTERVAL_";

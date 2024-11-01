@@ -27,6 +27,7 @@ public class DataSourceProvider {
         config.setPassword(Constants.DATABASE_KEY);
 
         config.setMaximumPoolSize(Constants.MAX_CONNECTION); // Maximum number of connections
+        config.setMinimumIdle(Constants.MIN_CONNECTION_IDLE); // Minimum number of idle connections
         config.setIdleTimeout(Constants.CONNECTION_IDLE_TIMEOUT); // Maximum time a connection is idle
         config.setMaxLifetime(Constants.CONNECTION_LIFETIME); // Maximum time of a connection
         config.setConnectionTimeout(Constants.CONNECTION_TIMEOUT); // Time to wait for a connection

@@ -1,6 +1,6 @@
 package math.server.repository.impl;
 
-import math.server.model.User;
+import math.server.entity.User;
 import math.server.repository.IUserRepository;
 import math.server.repository.utils.EntityManager;
 
@@ -16,6 +16,6 @@ public class UserRepository extends EntityManager<User> implements IUserReposito
 
     @Override
     public User findUserByUsername(String username) {
-        return findOne(User.class, "`username` = ?", List.of(username));
+        return findOne("`username` = ?", List.of(username));
     }
 }

@@ -6,6 +6,7 @@ import math.server.dto.response.BaseResponse;
 import math.server.dto.response.RoomDTO;
 import math.server.service.utils.SessionManager;
 import math.server.service.utils.UserSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,12 +42,12 @@ public class Room {
         return users;
     }
 
-    public boolean addUserToRoom(String clientID, UserSession userSession) {
+    public boolean addUserToRoom(String username, UserSession userSession) {
         if (isFull() || isPlayingGame())
             return false;
 
-        if (Objects.nonNull(clientID) && Objects.nonNull(userSession)) {
-            users.put(clientID, userSession);
+        if (Objects.nonNull(username) && Objects.nonNull(userSession)) {
+            users.put(username, userSession);
             ranking.put(userSession.getUsername(), 0); // Init user rank with current point = 0
             updateRoomData();
             return true;
@@ -61,9 +62,9 @@ public class Room {
         notifyAll(gson.toJson(response));
     }
 
-    public boolean removeUser(String clientID) {
-        if (Objects.nonNull(clientID)) {
-            users.remove(clientID);
+    public boolean removeUser(String username) {
+        if (Objects.nonNull(username)) {
+            users.remove(username);
             updateRoomData();
 
             if (isEmpty()) {

@@ -2,6 +2,7 @@ package math.server.dto.response;
 
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class GameResult {
 
     private UserDTO user;
@@ -9,7 +10,6 @@ public class GameResult {
 
     public GameResult() {}
 
-    @SuppressWarnings("unused")
     public UserDTO getUser() {
         return user;
     }
@@ -18,7 +18,6 @@ public class GameResult {
         this.user = user;
     }
 
-    @SuppressWarnings("unused")
     public Map<String, Integer> getRanking() {
         return ranking;
     }

@@ -1,8 +1,11 @@
-package math.server.model;
+package math.server.entity;
 
 import math.server.dto.response.UserDTO;
+import math.server.repository.utils.Entity;
 import math.server.service.utils.UserSession;
 
+@Entity(value = "user")
+@SuppressWarnings("unused")
 public class User {
 
     private Integer ID, gamesPlayed, score, rank;
@@ -45,7 +48,6 @@ public class User {
         return score;
     }
 
-    @SuppressWarnings("unused")
     public void setScore(Integer score) {
         this.score = score;
     }
@@ -62,7 +64,6 @@ public class User {
         return password;
     }
 
-    @SuppressWarnings("unused")
     public void setPassword(String password) {
         this.password = password;
     }
@@ -71,7 +72,6 @@ public class User {
         return gamesPlayed;
     }
 
-    @SuppressWarnings("unused")
     public void setGamesPlayed(Integer gamesPlayed) {
         this.gamesPlayed = gamesPlayed;
     }
@@ -80,7 +80,6 @@ public class User {
         return winRate;
     }
 
-    @SuppressWarnings("unused")
     public void setWinRate(Float winRate) {
         this.winRate = winRate;
     }
@@ -89,7 +88,6 @@ public class User {
         return rank;
     }
 
-    @SuppressWarnings("unused")
     public void setRank(Integer rank) {
         this.rank = rank;
     }

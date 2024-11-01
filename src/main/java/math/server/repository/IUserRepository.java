@@ -1,6 +1,6 @@
 package math.server.repository;
 
-import math.server.model.User;
+import math.server.entity.User;
 
 public interface IUserRepository {
 

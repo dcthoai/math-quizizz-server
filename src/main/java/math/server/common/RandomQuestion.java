@@ -4,7 +4,6 @@ import math.server.model.Question;
 
 import java.util.Arrays;
 import java.util.Random;
-import java.util.Stack;
 
 public class RandomQuestion {
 
@@ -28,80 +27,56 @@ public class RandomQuestion {
 
             try {
                 String expression = "" + num1 + operation1 + num2 + operation2 + num3;
-                double result = evaluateExpression(expression);
-                boolean validExpression = validateInteger(result);
+                int result = evaluateExpression(expression);
 
-                if (validExpression) {
-                    return new Question(Arrays.toString(numbers), String.valueOf(result), expression);
-                }
+                return new Question(Arrays.toString(numbers), String.valueOf(result), expression);
             } catch (Exception e) {
-                throw new RuntimeException("Cannot get random question");
+                System.out.println(e.getMessage());
             }
         }
     }
 
-    public static boolean validateInteger(double number) {
-        return number == Math.floor(number);
-    }
+    public static int evaluateExpression(String expression) {
+        expression = expression.strip();
+        expression = expression.replaceAll("\\s+", ""); // Replace white space
 
-    public static double evaluateExpression(String expression) {
-        // Loại bỏ khoảng trắng
-        expression = expression.replaceAll("\\s+", "");
-
-        if (expression.contains(".")) {
-            throw new IllegalArgumentException("Phép tính không hợp lệ");
-        }
-
-        // Kiểm tra tính hợp lệ của chuỗi
         if (!expression.matches("[0-9+*/-]*")) {
-            throw new IllegalArgumentException("Phép tính không hợp lệ: " + expression);
+            throw new IllegalArgumentException("Invalid expression");
         }
 
-        Stack<Integer> numbers = new Stack<>();
-        Stack<Character> operators = new Stack<>();
+        char[] expressionChar = expression.toCharArray();
 
-        for (int i = 0; i < expression.length(); i++) {
-            char ch = expression.charAt(i);
-            if (Character.isDigit(ch)) {
-                StringBuilder sb = new StringBuilder();
-                // Đọc số nguyên
-                while (i < expression.length() && Character.isDigit(expression.charAt(i))) {
-                    sb.append(expression.charAt(i));
-                    i++;
-                }
-                i--; // Giảm chỉ số để tránh tăng thêm
-                int number = Integer.parseInt(sb.toString());
-                numbers.push(number);
-            } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
-                // Kiểm tra trước khi thêm toán tử
-                while (!operators.isEmpty() && precedence(operators.peek()) >= precedence(ch)) {
-                    numbers.push(applyOperation(operators.pop(), numbers.pop(), numbers.pop()));
-                }
-                operators.push(ch);
+        try {
+            if (precedence(expressionChar[3]) && !precedence(expressionChar[1])) {
+                int firstNum = expressionChar[0] - '0';
+                int secondNum = applyOperation(expressionChar[3], expressionChar[2] - '0', expressionChar[4] - '0');
+
+                return applyOperation(expressionChar[1], firstNum, secondNum);
+            } else {
+                int firstNum = applyOperation(expressionChar[1], expressionChar[0] - '0', expressionChar[2] - '0');
+                int secondNum = expressionChar[4] - '0';
+
+                return applyOperation(expressionChar[3], firstNum, secondNum);
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        // Thực hiện các phép toán còn lại
-        while (!operators.isEmpty()) {
-            numbers.push(applyOperation(operators.pop(), numbers.pop(), numbers.pop()));
-        }
-
-        return numbers.pop();
     }
 
-    private static int precedence(char operator) {
+    private static boolean precedence(char operator) {
         switch (operator) {
             case '+':
             case '-':
-                return 1;
+                return false;
             case '*':
             case '/':
-                return 2;
+                return true;
         }
-        return 0;
+
+        throw new RuntimeException("Invalid operator");
     }
 
-    private static int applyOperation(char operator, int b, int a) {
+    private static int applyOperation(char operator, int a, int b) {
         switch (operator) {
             case '+':
                 return a + b;
@@ -110,26 +85,13 @@ public class RandomQuestion {
             case '*':
                 return a * b;
             case '/':
-                if (b == 0) {
-                    throw new IllegalArgumentException("Không thể chia cho 0");
+                if (b == 0 || (a % b != 0)) {
+                    throw new IllegalArgumentException("Invalid expression");
                 }
+
                 return a / b;
         }
 
-        throw new RuntimeException("Không thể tính phép tính này");
-    }
-
-
-    public static void main(String[] args) {
-       for (int i = 0; i< 6; ++ i) {
-           Question question = getRandomQuestion();
-
-           try {
-               double result = evaluateExpression(question.getExpression());
-               System.out.println("Ket qua: " + question.getExpression() + " : " + result);
-           } catch (Exception e) {
-               System.out.println(e);
-           }
-       }
+        throw new RuntimeException("Not found operator");
     }
 }

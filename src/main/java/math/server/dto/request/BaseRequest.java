@@ -1,5 +1,6 @@
 package math.server.dto.request;
 
+@SuppressWarnings("unused")
 public class BaseRequest {
 
     private String endPoint, request, action;
@@ -10,7 +11,6 @@ public class BaseRequest {
         return endPoint;
     }
 
-    @SuppressWarnings("unused")
     public void setEndPoint(String endPoint) {
         this.endPoint = endPoint;
     }
@@ -19,7 +19,6 @@ public class BaseRequest {
         return request;
     }
 
-    @SuppressWarnings("unused")
     public void setRequest(String request) {
         this.request = request;
     }

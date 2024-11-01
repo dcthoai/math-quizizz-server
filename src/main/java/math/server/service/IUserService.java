@@ -1,7 +1,7 @@
 package math.server.service;
 
 import math.server.dto.request.UserRequest;
-import math.server.model.User;
+import math.server.entity.User;
 
 public interface IUserService {
 

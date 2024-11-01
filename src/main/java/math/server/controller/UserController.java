@@ -9,7 +9,7 @@ import math.server.dto.request.UserRequest;
 import math.server.dto.response.BaseResponse;
 import math.server.dto.response.UserDTO;
 
-import math.server.model.User;
+import math.server.entity.User;
 
 import math.server.router.EndPoint;
 import math.server.router.RouterMapping;

@@ -1,5 +1,8 @@
 package math.server.model;
 
+import math.server.dto.response.QuestionDTO;
+
+@SuppressWarnings("unused")
 public class Question {
 
     private final String question, answer, expression;
@@ -8,6 +11,10 @@ public class Question {
         this.answer = answer;
         this.question = question;
         this.expression = expression;
+    }
+
+    public QuestionDTO getDTO() {
+        return new QuestionDTO(question, answer);
     }
 
     public String getQuestion() {

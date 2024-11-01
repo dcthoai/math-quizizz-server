@@ -1,7 +1,7 @@
 package math.server.service.impl;
 
 import math.server.dto.request.UserRequest;
-import math.server.model.User;
+import math.server.entity.User;
 import math.server.repository.impl.UserRepository;
 import math.server.service.IUserService;
 
@@ -17,12 +17,12 @@ public class UserService implements IUserService {
 
     @Override
     public Integer save(UserRequest user) {
-        return userRepository.insert(User.class, new User(user.getUsername(), user.getPassword()));
+        return userRepository.insert(new User(user.getUsername(), user.getPassword()));
     }
 
     @Override
     public User findUserById(int id) {
-        return userRepository.findOne(User.class, id);
+        return userRepository.findOne(id);
     }
 
     @Override

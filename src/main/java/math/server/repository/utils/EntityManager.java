@@ -1,12 +1,13 @@
 package math.server.repository.utils;
 
 import math.server.common.Common;
-import math.server.config.DataSourceProvider;
 
+import math.server.config.DataSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A class that provides basic CRUD methods for manipulating the database
@@ -26,15 +28,28 @@ import java.util.Map;
 public class EntityManager<T> implements IEntityManager<T> {
 
     private static final Logger log = LoggerFactory.getLogger(EntityManager.class);
-    protected final Connection connection;
+    private final Class<T> entityType;
+    private final String entityName;
 
+    @SuppressWarnings("unchecked")
     public EntityManager() {
-        this.connection = DataSourceProvider.getInstance().getConnection();
+        this.entityType = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+
+        if (entityType.isAnnotationPresent(Entity.class)) {
+            Entity entityAnnotation = entityType.getAnnotation(Entity.class);
+            this.entityName = entityAnnotation.value();
+        } else {
+            this.entityName = null;
+        }
+
+        if (Objects.isNull(entityName) || entityName.isEmpty()) {
+            log.error("Not found entity");
+        }
     }
 
-    @Override
-    public List<T> query(Class<T> entityName, String sql, List<Object> params) {
+    private List<T> executeQuery(String sql, List<Object> params, Class<T> clazz) {
         try {
+            Connection connection = DataSourceProvider.getInstance().getConnection();
             PreparedStatement query = connection.prepareStatement(sql);
             log.info("Execute query: " + sql);
 
@@ -46,13 +61,14 @@ public class EntityManager<T> implements IEntityManager<T> {
             List<T> results = new ArrayList<>();
 
             while(resultSet.next()) {
-                T object = entityName.getDeclaredConstructor().newInstance();
+                T object = clazz.getDeclaredConstructor().newInstance();
                 Common.objectMapper(resultSet, object);
                 results.add(object);
             }
 
             resultSet.close();
             query.close();
+            connection.close();
 
             return results;
         } catch (SQLException e) {
@@ -71,9 +87,19 @@ public class EntityManager<T> implements IEntityManager<T> {
     }
 
     @Override
-    public T findOne(Class<T> entityName, Integer ID) {
-        String sql = "SELECT * FROM `" + entityName.getSimpleName() + "` WHERE `id` = ?";
-        List<T> results = query(entityName, sql, List.of(ID));
+    public List<T> query(String sql, List<Object> params) {
+        return executeQuery(sql, params, entityType);
+    }
+
+    @Override
+    public List<T> query(String sql, List<Object> params, Class<T> clazz) {
+        return executeQuery(sql, params, clazz);
+    }
+
+    @Override
+    public T findOne(Integer ID) {
+        String sql = "SELECT * FROM `" + entityName + "` WHERE `id` = ?";
+        List<T> results = query(sql, List.of(ID));
 
         if (results.isEmpty())
             return null;
@@ -82,9 +108,9 @@ public class EntityManager<T> implements IEntityManager<T> {
     }
 
     @Override
-    public T findOne(Class<T> entityName, String conditions, List<Object> params) {
-        String sql = "SELECT * FROM `" + entityName.getSimpleName() + "` WHERE " + conditions;
-        List<T> results = query(entityName, sql, params);
+    public T findOne(String conditions, List<Object> params) {
+        String sql = "SELECT * FROM `" + entityName + "` WHERE " + conditions;
+        List<T> results = query(sql, params);
 
         if (results.isEmpty())
             return null;
@@ -93,27 +119,25 @@ public class EntityManager<T> implements IEntityManager<T> {
     }
 
     @Override
-    public List<T> findAll(Class<T> entityName) {
-        String sql = "SELECT * FROM `" + entityName.getSimpleName() + "`";
-        return query(entityName, sql, Collections.emptyList());
+    public List<T> findAll() {
+        String sql = "SELECT * FROM `" + entityName + "`";
+        return query(sql, Collections.emptyList());
     }
 
     @Override
-    public List<T> findAll(Class<T> entityName, String conditions, List<Object> params) {
-        String sql = "SELECT * FROM `" + entityName.getSimpleName() + "` WHERE " + conditions;
-        return query(entityName, sql, params);
+    public List<T> findAll(String conditions, List<Object> params) {
+        String sql = "SELECT * FROM `" + entityName + "` WHERE " + conditions;
+        return query(sql, params);
     }
 
     @Override
-    public Integer insert(Class<T> entityName, Object object) {
-        String tableName = entityName.getSimpleName();
-
+    public Integer insert(Object object) {
         try {
             Map<String, Object> objectFields = Common.getObjectFields(object);
             List<Object> params = new ArrayList<>(objectFields.values());
             StringBuilder columns = new StringBuilder();
             StringBuilder values = new StringBuilder();
-            StringBuilder sql = new StringBuilder("INSERT INTO " + tableName);
+            StringBuilder sql = new StringBuilder("INSERT INTO " + entityName);
 
             for (String key : objectFields.keySet()) {
                 columns.append("`").append(key).append("`, ");
@@ -122,8 +146,9 @@ public class EntityManager<T> implements IEntityManager<T> {
 
             columns.delete(columns.length() - 2, columns.length()); // Remove last comma
             values.delete(values.length() - 2, values.length()); // Remove last comma
-
             sql.append(" (").append(columns).append(") VALUES (").append(values).append(")");
+
+            Connection connection = DataSourceProvider.getInstance().getConnection();
             PreparedStatement statement = connection.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
             log.info("Execute query: " + sql);
 
@@ -132,58 +157,86 @@ public class EntityManager<T> implements IEntityManager<T> {
             }
 
             int affectedRows = statement.executeUpdate();
+            int recordID = 0;
 
             if (affectedRows == 0) {
-                statement.close();
                 log.error("Inserting data failed, no rows affected");
             } else {
                 ResultSet generatedKeys = statement.getGeneratedKeys();
 
                 if (generatedKeys.next()) {
-                    int recordID = generatedKeys.getInt(1); // Return ID of new record which is insert in database
-                    generatedKeys.close();
-                    statement.close();
-
-                    return recordID;
+                    recordID = generatedKeys.getInt(1); // Return ID of new record which is insert in database
                 } else {
-                    generatedKeys.close();
-                    statement.close();
                     log.error("Inserting data failed, no ID obtained");
                 }
+
+                generatedKeys.close();
             }
+
+            statement.close();
+            connection.close();
+
+            return recordID;
         } catch (IllegalAccessException e) {
             log.error("Failed to get params from object", e);
         } catch (SQLException e) {
-            log.error("Failed to insert data into table {}", tableName, e);
+            log.error("Failed to insert data into table {}", entityName, e);
         }
 
         return 0;
     }
 
-    private boolean execute(String sql, List<Object> params) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            log.info("Execute query: " + sql);
+    @Override
+    public void saveAll(List<T> objects) {
+        if (Objects.isNull(objects) || objects.isEmpty())
+            return;
 
-            for (int i = 0; i < params.size(); ++i) {
-                preparedStatement.setObject(i + 1, params.get(i)); // JDBC index start with 1
+        try {
+            Map<String, Object> objectFields = Common.getObjectFields(objects.get(0));
+            List<String> columns = new ArrayList<>(objectFields.keySet());
+            StringBuilder sql = new StringBuilder("INSERT INTO " + entityName + " (");
+
+            for (String column : columns) {
+                sql.append("`").append(column).append("`, ");
             }
 
-            int affectedRows = preparedStatement.executeUpdate();
-            preparedStatement.close();
+            sql.delete(sql.length() - 2, sql.length());
+            sql.append(") VALUES ");
 
-            return affectedRows > 0;
+            String placeholders = "(" + "?, ".repeat(columns.size());
+            placeholders = placeholders.substring(0, placeholders.length() - 2) + ")";
+            sql.append(placeholders.repeat(objects.size()).replace(")(", "), ("));
+
+            Connection connection = DataSourceProvider.getInstance().getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
+            log.info("Execute batch insert query: " + sql);
+
+            int paramIndex = 1;
+
+            for (Object object : objects) {
+                List<Object> params = new ArrayList<>(Common.getObjectFields(object).values());
+
+                for (Object param : params) {
+                    statement.setObject(paramIndex++, param);
+                }
+            }
+
+            statement.executeUpdate();
+            statement.close();
+            connection.close();
+
+        } catch (IllegalAccessException e) {
+            log.error("Failed to get params from object", e);
         } catch (SQLException e) {
-            log.error("Update or delete entity failed", e);
-            return false;
+            log.error("Failed to insert data into table {}", entityName, e);
         }
     }
 
     @Override
-    public boolean update(Class<T> entityName, String conditions, Map<String, Object> columnsData) {
+    public boolean update(String conditions, Map<String, Object> columnsData) {
         List<Object> params = new ArrayList<>(columnsData.values());
         StringBuilder columns = new StringBuilder();
-        StringBuilder sql = new StringBuilder("UPDATE `" + entityName.getSimpleName() + "` SET ");
+        StringBuilder sql = new StringBuilder("UPDATE `" + entityName + "` SET ");
 
         columnsData.keySet().forEach(key -> columns.append("`").append(key).append("` = ?,"));
         columns.delete(columns.length() - 1, columns.length()); // Remove last comma
@@ -193,14 +246,35 @@ public class EntityManager<T> implements IEntityManager<T> {
     }
 
     @Override
-    public boolean delete(Class<T> entityName, Integer ID) {
-        String sql = "DELETE FROM `" + entityName.getSimpleName() + "` WHERE `id` = ?";
+    public boolean delete(Integer ID) {
+        String sql = "DELETE FROM `" + entityName + "` WHERE `id` = ?";
         return execute(sql, List.of(ID));
     }
 
     @Override
-    public boolean delete(Class<T> entityName, String conditions, List<Object> params) {
-        String sql = "DELETE FROM `" + entityName.getSimpleName() + "` WHERE " + conditions;
+    public boolean delete(String conditions, List<Object> params) {
+        String sql = "DELETE FROM `" + entityName + "` WHERE " + conditions;
         return execute(sql, params);
+    }
+
+    private boolean execute(String sql, List<Object> params) {
+        try {
+            Connection connection = DataSourceProvider.getInstance().getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            log.info("Execute query: " + sql);
+
+            for (int i = 0; i < params.size(); ++i) {
+                preparedStatement.setObject(i + 1, params.get(i)); // JDBC index start with 1
+            }
+
+            int affectedRows = preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
+
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            log.error("Update or delete entity failed", e);
+            return false;
+        }
     }
 }

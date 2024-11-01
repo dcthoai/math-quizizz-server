@@ -1,5 +1,9 @@
-package math.server.model;
+package math.server.entity;
 
+import math.server.repository.utils.Entity;
+
+@Entity(value = "rank")
+@SuppressWarnings("unused")
 public class Rank {
 
     Integer ID, userID, score;

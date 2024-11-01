@@ -1,13 +1,20 @@
-package math.server.model;
+package math.server.entity;
+
+import math.server.repository.utils.Entity;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
+@Entity(value = "game")
+@SuppressWarnings("unused")
 public class Game {
 
     private Integer ID;
     private Timestamp time;
 
-    public Game() {}
+    public Game() {
+        this.time = Timestamp.from(Instant.now());
+    }
 
     public Integer getID() {
         return ID;

@@ -1,15 +1,15 @@
 package math.server.dto.response;
 
+@SuppressWarnings("unused")
 public class UserDTO {
 
-    private Integer ID, gamesPlayed, score, rank, currentPoint, currentRank;
+    private Integer ID, gamesPlayed, score, rank, currentPoint, currentRank, correctAnswers;
     private Float winRate;
     private Boolean loginStatus;
     private String username;
 
     public UserDTO() {}
 
-    @SuppressWarnings("unused")
     public Integer getID() {
         return ID;
     }
@@ -18,7 +18,6 @@ public class UserDTO {
         this.ID = ID;
     }
 
-    @SuppressWarnings("unused")
     public Integer getGamesPlayed() {
         return gamesPlayed;
     }
@@ -27,7 +26,6 @@ public class UserDTO {
         this.gamesPlayed = gamesPlayed;
     }
 
-    @SuppressWarnings("unused")
     public Integer getScore() {
         return score;
     }
@@ -36,7 +34,6 @@ public class UserDTO {
         this.score = score;
     }
 
-    @SuppressWarnings("unused")
     public Integer getRank() {
         return rank;
     }
@@ -45,7 +42,6 @@ public class UserDTO {
         this.rank = rank;
     }
 
-    @SuppressWarnings("unused")
     public Integer getCurrentPoint() {
         return currentPoint;
     }
@@ -54,7 +50,6 @@ public class UserDTO {
         this.currentPoint = currentPoint;
     }
 
-    @SuppressWarnings("unused")
     public Integer getCurrentRank() {
         return currentRank;
     }
@@ -63,7 +58,6 @@ public class UserDTO {
         this.currentRank = currentRank;
     }
 
-    @SuppressWarnings("unused")
     public Float getWinRate() {
         return winRate;
     }
@@ -72,7 +66,6 @@ public class UserDTO {
         this.winRate = winRate;
     }
 
-    @SuppressWarnings("unused")
     public Boolean getLoginStatus() {
         return loginStatus;
     }
@@ -81,12 +74,19 @@ public class UserDTO {
         this.loginStatus = loginStatus;
     }
 
-    @SuppressWarnings("unused")
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Integer getCorrectAnswers() {
+        return correctAnswers;
+    }
+
+    public void setCorrectAnswers(Integer correctAnswers) {
+        this.correctAnswers = correctAnswers;
     }
 }

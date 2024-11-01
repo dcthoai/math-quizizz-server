@@ -6,21 +6,25 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public interface IEntityManager<T> {
 
-    List<T> query(Class<T> entityName, String sql, List<Object> params);
+    List<T> query(String sql, List<Object> params);
 
-    T findOne(Class<T> entityName, Integer ID);
+    List<T> query(String sql, List<Object> params, Class<T> clazz);
 
-    T findOne(Class<T> entityName, String conditions, List<Object> params);
+    T findOne(Integer ID);
 
-    List<T> findAll(Class<T> entityName);
+    T findOne(String conditions, List<Object> params);
 
-    List<T> findAll(Class<T> entityName, String conditions, List<Object> params);
+    List<T> findAll();
 
-    Integer insert(Class<T> entityName, Object object);
+    List<T> findAll(String conditions, List<Object> params);
 
-    boolean update(Class<T> entityName, String conditions, Map<String, Object> columnsData);
+    Integer insert(Object object);
 
-    boolean delete(Class<T> entityName, Integer ID);
+    void saveAll(List<T> objects);
 
-    boolean delete(Class<T> entityName, String conditions, List<Object> params);
+    boolean update(String conditions, Map<String, Object> columnsData);
+
+    boolean delete(Integer ID);
+
+    boolean delete(String conditions, List<Object> params);
 }

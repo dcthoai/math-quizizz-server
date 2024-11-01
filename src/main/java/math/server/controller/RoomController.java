@@ -49,7 +49,7 @@ public class RoomController implements RouterMapping {
     public BaseResponse createRoom(UserSession session, BaseRequest request) {
         Room room = sessionManager.getRoom(session.getCurrentRoom(), true);  // Create new room if user has no rooms available
         session.setCurrentRoom(room.getRoomID());
-        room.addUserToRoom(session.getClientID(), session);
+        room.addUserToRoom(session.getUsername(), session);
 
         // Update list rooms for all online users
         sessionManager.notifyChangeRoomsData();
@@ -73,7 +73,7 @@ public class RoomController implements RouterMapping {
         Room room = sessionManager.getRoom(request.getRequest(), false);
 
         if (Objects.nonNull(room)) {
-            boolean isSuccess = room.addUserToRoom(session.getClientID(), session);
+            boolean isSuccess = room.addUserToRoom(session.getUsername(), session);
 
             if (isSuccess) {
                 session.setCurrentRoom(room.getRoomID());
