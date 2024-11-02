@@ -20,8 +20,10 @@ public class GameService implements IGameService {
     private static final Logger log = LoggerFactory.getLogger(GameService.class);
     private final GameRepository gameRepository;
     private final PlayerRepository playerRepository;
+    private final RankingService rankingService;
 
     public GameService() {
+        this.rankingService = new RankingService();
         this.gameRepository = new GameRepository();
         this.playerRepository = new PlayerRepository();
     }
@@ -50,7 +52,11 @@ public class GameService implements IGameService {
 
                 playerRepository.saveAll(players);
             }
-        }).exceptionally(ex -> {
+        })
+        .thenRun(() -> {
+            rankingService.updateRanking(new ArrayList<>(users.values()), ranking);
+        })
+        .exceptionally(ex -> {
             log.error("Failed to save game history asynchronously", ex);
             return null;
         });

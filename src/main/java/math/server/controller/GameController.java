@@ -85,6 +85,7 @@ public class GameController implements RouterMapping {
 
         if (Objects.nonNull(users) && !users.isEmpty()) {
             List<UserSession> userSessions = new ArrayList<>(users.values());
+            gameService.saveGameHistory(users, roomRanking);
 
             userSessions.forEach(session -> {
                 GameResult gameResult = new GameResult();
@@ -102,8 +103,6 @@ public class GameController implements RouterMapping {
                 session.notify(gson.toJson(response));
                 session.resetGameValue();
             });
-
-            gameService.saveGameHistory(users, roomRanking);
         }
 
         sessionManager.removeRoom(roomID);

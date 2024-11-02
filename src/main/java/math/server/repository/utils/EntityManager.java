@@ -90,6 +90,35 @@ public class EntityManager<T> implements IEntityManager<T> {
     }
 
     @Override
+    public long count(String sql, List<Object> params) {
+        long rows = 0L;
+
+        try {
+            Connection connection = DataSourceProvider.getInstance().getConnection();
+            PreparedStatement query = connection.prepareStatement(sql);
+            log.info("Execute query: " + sql);
+
+            for (int i = 0; i < params.size(); i++) {
+                query.setObject(i + 1, params.get(i));  // JDBC index start with 1
+            }
+
+            ResultSet resultSet = query.executeQuery();
+
+            if (resultSet.next()) {
+                rows = resultSet.getLong(1);
+            }
+
+            resultSet.close();
+            query.close();
+            connection.close();
+        } catch (SQLException e) {
+            log.error("Failed to query data", e);
+        }
+
+        return rows;
+    }
+
+    @Override
     public List<T> query(String sql, List<Object> params) {
         return executeQuery(sql, params, entityType);
     }
@@ -174,7 +203,7 @@ public class EntityManager<T> implements IEntityManager<T> {
             List<Object> params = new ArrayList<>(objectFields.values());
             StringBuilder columns = new StringBuilder();
             StringBuilder values = new StringBuilder();
-            StringBuilder sql = new StringBuilder("INSERT INTO " + entityName);
+            StringBuilder sql = new StringBuilder("INSERT INTO `" + entityName);
 
             for (String key : objectFields.keySet()) {
                 columns.append("`").append(key).append("`, ");
@@ -183,7 +212,7 @@ public class EntityManager<T> implements IEntityManager<T> {
 
             columns.delete(columns.length() - 2, columns.length()); // Remove last comma
             values.delete(values.length() - 2, values.length()); // Remove last comma
-            sql.append(" (").append(columns).append(") VALUES (").append(values).append(")");
+            sql.append("` (").append(columns).append(") VALUES (").append(values).append(")");
 
             Connection connection = DataSourceProvider.getInstance().getConnection();
             PreparedStatement statement = connection.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
@@ -246,7 +275,7 @@ public class EntityManager<T> implements IEntityManager<T> {
 
             Connection connection = DataSourceProvider.getInstance().getConnection();
             PreparedStatement statement = connection.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
-            log.info("Execute batch insert query: " + sql);
+            log.info("Execute insert query: " + sql);
 
             int paramIndex = 1;
 
@@ -269,19 +298,51 @@ public class EntityManager<T> implements IEntityManager<T> {
         }
     }
 
+//    @Override
+//    public boolean update(Object object) {
+//        try {
+//            Map<String, Object> columnsData = Common.getObjectFields(object);
+//
+//            StringBuilder columns = new StringBuilder();
+//            StringBuilder sql = new StringBuilder("UPDATE `" + entityName + "` SET ");
+//
+//            columnsData.keySet().forEach(key -> columns.append("`").append(key).append("` = ?,"));
+//            columns.delete(columns.length() - 1, columns.length()); // Remove last comma
+//            sql.append(columns);
+//
+//            return execute(sql.toString(), Arrays.asList(columnsData.values().toArray()));
+//        } catch (IllegalAccessException e) {
+//            log.error("Cannot update entity: {}", object.getClass(), e);
+//        }
+//
+//        return false;
+//    }
+
     @Override
     public boolean update(Object object) {
         try {
             Map<String, Object> columnsData = Common.getObjectFields(object);
+            Object ID = columnsData.get("id");
+            columnsData.remove("id");
+
+            if (Objects.isNull(ID)) {
+                log.error("ID cannot be null for update operation.");
+                return false;
+            }
 
             StringBuilder columns = new StringBuilder();
             StringBuilder sql = new StringBuilder("UPDATE `" + entityName + "` SET ");
 
-            columnsData.keySet().forEach(key -> columns.append("`").append(key).append("` = ?,"));
-            columns.delete(columns.length() - 1, columns.length()); // Remove last comma
-            sql.append(columns);
+            columnsData.keySet().forEach(key -> columns.append("`").append(key).append("` = ?, "));
 
-            return execute(sql.toString(), Arrays.asList(columnsData.values().toArray()));
+            columns.delete(columns.length() - 2, columns.length()); // Remove last comma and space
+            sql.append(columns);
+            sql.append(" WHERE `ID` = ?");
+
+            List<Object> params = new ArrayList<>(columnsData.values());
+            params.add(ID);
+
+            return execute(sql.toString(), params);
         } catch (IllegalAccessException e) {
             log.error("Cannot update entity: {}", object.getClass(), e);
         }

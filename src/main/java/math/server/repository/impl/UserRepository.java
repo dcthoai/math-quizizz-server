@@ -18,4 +18,20 @@ public class UserRepository extends EntityManager<User> implements IUserReposito
     public User findUserByUsername(String username) {
         return findOne("`username` = ?", List.of(username));
     }
+
+    @Override
+    public int getGamesWinOfUser(Integer userID) {
+        String sql = "SELECT COUNT(DISTINCT p.gameID) AS wins FROM `player` p " +
+                     "WHERE p.userID = ? AND p.rank = 1 ";
+
+        return (int) count(sql, List.of(userID));
+    }
+
+    @Override
+    public int getTotalGamesPlayedOfUser(Integer userID) {
+        String sql = "SELECT COUNT(DISTINCT p.gameID) AS totalGames " +
+                     "FROM `player` p WHERE p.userID = ?";
+
+        return (int) count(sql, List.of(userID));
+    }
 }

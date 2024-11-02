@@ -65,7 +65,7 @@ public class Common {
             String fieldName = field.getName();
             Object value = field.get(object);
 
-            objectMap.put(fieldName, value);
+            objectMap.put(fieldName.toLowerCase(), value);
         }
 
         return objectMap;

@@ -29,26 +29,43 @@ public class RankingRepository extends EntityManager<Rank> implements IRankingRe
 
     @Override
     public RankDTO getRankByUserID(Integer userID) {
-        return findOne("`userID` = ?", List.of(userID), RankDTO.class);
+        String sql = " SELECT ranked_data.ID, u.username, ranked_data.score, ranked_data.userRank " +
+                " FROM ( " +
+                "    SELECT `ID`, `userID`, `score`, RANK() OVER (ORDER BY `score` DESC) AS `userRank` " +
+                "    FROM `rank` " +
+                " ) AS ranked_data " +
+                " JOIN `user` u ON ranked_data.userID = u.ID " +
+                " WHERE u.ID = ?";
+
+        List<RankDTO> rankDTOs = query(sql, List.of(userID), RankDTO.class);
+
+        if (!rankDTOs.isEmpty())
+            return rankDTOs.get(0);
+
+        return null;
     }
 
     @Override
     public RankDTO getRankByUsername(String username) {
-        return findOne("`userID` in (SELECT `ID` FROM `user` WHERE `username` = ?)", List.of(username), RankDTO.class);
+        String sql = " SELECT ranked_data.ID, u.username, ranked_data.score, ranked_data.userRank " +
+                " FROM ( " +
+                "    SELECT `ID`, `userID`, `score`, RANK() OVER (ORDER BY `score` DESC) AS `userRank` " +
+                "    FROM `rank` " +
+                " ) AS ranked_data " +
+                " JOIN `user` u ON ranked_data.userID = u.ID " +
+                " WHERE u.username = ?";
+
+        List<RankDTO> rankDTOs = query(sql, List.of(username), RankDTO.class);
+
+        if (!rankDTOs.isEmpty())
+            return rankDTOs.get(0);
+
+        return null;
     }
 
     @Override
     public int getUserRank(Integer userID) {
-        String sql = " SELECT ranked_data.ID, u.username, ranked_data.score, ranked_data.userRank " +
-                     " FROM ( " +
-                     "    SELECT `ID`, `userID`, `score`, RANK() OVER (ORDER BY `score` DESC) AS `userRank` " +
-                     "    FROM `rank` " +
-                     " ) AS ranked_data " +
-                     " JOIN `user` u ON ranked_data.userID = u.ID " +
-                     " WHERE u.ID = ?";
-
-        List<RankDTO> rankDTOs = query(sql, List.of(userID), RankDTO.class);
-        RankDTO rank = rankDTOs.get(0);
+        RankDTO rank = getRankByUserID(userID);
 
         if (Objects.nonNull(rank))
             return rank.getUserRank();

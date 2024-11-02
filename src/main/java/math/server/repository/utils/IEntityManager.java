@@ -5,6 +5,8 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface IEntityManager<T> {
 
+    long count(String sql, List<Object> params);
+
     List<T> query(String sql, List<Object> params);
 
     <EntityType> List<EntityType> query(String sql, List<Object> params, Class<EntityType> entityTypeClass);

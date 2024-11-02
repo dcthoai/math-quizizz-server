@@ -112,14 +112,6 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public String getClientID() {
-        return clientID;
-    }
-
-    public UserSession getSession() {
-        return session;
-    }
-
     public void sendMessage(String message) {
         log.info("Send message for: {}, message: {}", clientID, message);
         responseWriter.println(message);

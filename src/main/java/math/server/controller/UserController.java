@@ -14,6 +14,7 @@ import math.server.entity.User;
 import math.server.router.EndPoint;
 import math.server.router.RouterMapping;
 
+import math.server.service.impl.RankingService;
 import math.server.service.impl.UserService;
 import math.server.service.utils.SessionManager;
 import math.server.service.utils.UserSession;
@@ -30,9 +31,11 @@ public class UserController implements RouterMapping {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private static final SessionManager sessionManager = SessionManager.getInstance();
     private final UserService userService;
+    private final RankingService rankingService;
 
     public UserController() {
         this.userService = new UserService();
+        this.rankingService = new RankingService();
     }
     
     @EndPoint("/info")
@@ -43,7 +46,7 @@ public class UserController implements RouterMapping {
             User user = userService.findUserById(session.getUserID());
 
             if (Objects.nonNull(user)) {
-                UserDTO userDTO = User.getUserDTO(session, user);
+                UserDTO userDTO = userService.getGameInfo(session.getUserID());
                 return new BaseResponse(request.getAction(), userDTO);
             }
 
@@ -69,6 +72,7 @@ public class UserController implements RouterMapping {
             Integer userID = userService.save(userRequest);
 
             if (Objects.nonNull(userID) && userID > 0) {
+                rankingService.addNewUserRank(userID);
                 return new BaseResponse(Constants.SUCCESS, true, request.getAction(), "Register successfully!", String.valueOf(userID));
             }
 
