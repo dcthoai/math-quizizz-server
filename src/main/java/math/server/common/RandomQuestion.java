@@ -3,7 +3,11 @@ package math.server.common;
 import math.server.model.Question;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RandomQuestion {
 
@@ -93,5 +97,30 @@ public class RandomQuestion {
         }
 
         throw new RuntimeException("Not found operator");
+    }
+
+    public static boolean containsOnlyOriginalNumbers(String original, String toCheck) {
+        Set<Integer> originalNumbers = extractNumbers(original);
+        Set<Integer> numbersToCheck = extractNumbers(toCheck);
+
+        for (Integer number : numbersToCheck) {
+            if (!originalNumbers.contains(number)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static Set<Integer> extractNumbers(String input) {
+        Set<Integer> numbers = new HashSet<>();
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(input);
+
+        while (matcher.find()) {
+            numbers.add(Integer.parseInt(matcher.group()));
+        }
+
+        return numbers;
     }
 }

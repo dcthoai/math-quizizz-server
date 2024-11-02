@@ -119,7 +119,7 @@ public class ClientHandler implements Runnable {
 
     public void closeConnection() {
         log.info("Close socket connection {}...", socket.getInetAddress());
-        sessionManager.invalidSession(clientID);
+        session.invalidSession();
 
         try {
             socket.close();

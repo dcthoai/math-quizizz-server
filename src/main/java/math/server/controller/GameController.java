@@ -31,7 +31,7 @@ import java.util.Objects;
 public class GameController implements RouterMapping {
 
     private static final Logger log = LoggerFactory.getLogger(GameController.class);
-    private static final Map<String, String> correctAnswers = new HashMap<>();
+    private static final Map<String, Question> correctAnswers = new HashMap<>();
     private final SessionManager sessionManager = SessionManager.getInstance();
     private final ScheduledTasksService scheduledTasksService = ScheduledTasksService.getInstance();
     private final Gson gson = new Gson();
@@ -65,7 +65,7 @@ public class GameController implements RouterMapping {
     private void playGame(Room room) {
         Question question = RandomQuestion.getRandomQuestion();
         String action = "/game/question";
-        correctAnswers.put(room.getRoomID(), question.getAnswer());
+        correctAnswers.put(room.getRoomID(), question);
 
         BaseResponse response = new BaseResponse(action, gson.toJson(question.getDTO()));
         room.notifyAll(gson.toJson(response));
@@ -131,12 +131,17 @@ public class GameController implements RouterMapping {
 
     private boolean checkAnswer(String questionKey, String answer) {
         try {
-            int result = RandomQuestion.evaluateExpression(answer);
-            return Objects.equals(correctAnswers.get(questionKey), String.valueOf(result));
+            Question question = correctAnswers.get(questionKey);
+
+            if (RandomQuestion.containsOnlyOriginalNumbers(question.getQuestion(), answer)) {
+                int result = RandomQuestion.evaluateExpression(answer);
+                return Objects.equals(question.getAnswer(), String.valueOf(result));
+            }
         } catch (Exception e) {
             log.error("Cannot check answer", e);
-            return false;
         }
+
+        return false;
     }
 
     @EndPoint("/answer")

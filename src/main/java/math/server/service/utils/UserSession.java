@@ -56,6 +56,7 @@ public class UserSession {
                 room.removeUser(clientID);
         }
 
+        resetGameValue();
         SessionManager.getInstance().invalidSession(clientID);
     }
 
