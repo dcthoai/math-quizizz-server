@@ -1,17 +1,18 @@
-package math.server.service;
+package math.server.service.impl;
 
 import math.server.entity.Game;
 import math.server.entity.Player;
 import math.server.repository.impl.GameRepository;
 import math.server.repository.impl.PlayerRepository;
+import math.server.service.IGameService;
 import math.server.service.utils.UserSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class GameService implements IGameService {
@@ -29,9 +30,9 @@ public class GameService implements IGameService {
     public void saveGameHistory(Map<String, UserSession> users, Map<String, Integer> ranking) {
         CompletableFuture.runAsync(() -> {
             Game game = new Game();
-            Integer gameID = gameRepository.insert(game);
+            int gameID = gameRepository.save(game);
 
-            if (Objects.nonNull(gameID) && gameID > 0) {
+            if (gameID > 0) {
                 List<Player> players = new ArrayList<>();
                 int[] rank = {1};
 

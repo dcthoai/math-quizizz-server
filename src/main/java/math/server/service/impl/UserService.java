@@ -17,7 +17,7 @@ public class UserService implements IUserService {
 
     @Override
     public Integer save(UserRequest user) {
-        return userRepository.insert(new User(user.getUsername(), user.getPassword()));
+        return userRepository.save(new User(user.getUsername(), user.getPassword()));
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import java.util.Objects;
  * @param <T> Name of the entity that wants to operate with the database
  * @author dcthoai
  */
+@SuppressWarnings("unused")
 public class EntityManager<T> implements IEntityManager<T> {
 
     private static final Logger log = LoggerFactory.getLogger(EntityManager.class);
@@ -47,7 +50,7 @@ public class EntityManager<T> implements IEntityManager<T> {
         }
     }
 
-    private List<T> executeQuery(String sql, List<Object> params, Class<T> clazz) {
+    private <K> List<K> executeQuery(String sql, List<Object> params, Class<K> clazz) {
         try {
             Connection connection = DataSourceProvider.getInstance().getConnection();
             PreparedStatement query = connection.prepareStatement(sql);
@@ -58,10 +61,10 @@ public class EntityManager<T> implements IEntityManager<T> {
             }
 
             ResultSet resultSet = query.executeQuery();
-            List<T> results = new ArrayList<>();
+            List<K> results = new ArrayList<>();
 
             while(resultSet.next()) {
-                T object = clazz.getDeclaredConstructor().newInstance();
+                K object = clazz.getDeclaredConstructor().newInstance();
                 Common.objectMapper(resultSet, object);
                 results.add(object);
             }
@@ -92,8 +95,8 @@ public class EntityManager<T> implements IEntityManager<T> {
     }
 
     @Override
-    public List<T> query(String sql, List<Object> params, Class<T> clazz) {
-        return executeQuery(sql, params, clazz);
+    public <EntityType> List<EntityType> query(String sql, List<Object> params, Class<EntityType> entityTypeClass) {
+        return executeQuery(sql, params, entityTypeClass);
     }
 
     @Override
@@ -108,9 +111,31 @@ public class EntityManager<T> implements IEntityManager<T> {
     }
 
     @Override
+    public <EntityType> EntityType findOne(Integer ID, Class<EntityType> entityTypeClass) {
+        String sql = "SELECT * FROM `" + entityName + "` WHERE `id` = ?";
+        List<EntityType> results = query(sql, List.of(ID), entityTypeClass);
+
+        if (results.isEmpty())
+            return null;
+
+        return results.get(0);
+    }
+
+    @Override
     public T findOne(String conditions, List<Object> params) {
         String sql = "SELECT * FROM `" + entityName + "` WHERE " + conditions;
         List<T> results = query(sql, params);
+
+        if (results.isEmpty())
+            return null;
+
+        return results.get(0);
+    }
+
+    @Override
+    public <EntityType> EntityType findOne(String conditions, List<Object> params, Class<EntityType> entityTypeClass) {
+        String sql = "SELECT * FROM `" + entityName + "` WHERE " + conditions;
+        List<EntityType> results = query(sql, params, entityTypeClass);
 
         if (results.isEmpty())
             return null;
@@ -131,7 +156,19 @@ public class EntityManager<T> implements IEntityManager<T> {
     }
 
     @Override
-    public Integer insert(Object object) {
+    public <EntityType> List<EntityType> findAll(Class<EntityType> entityTypeClass) {
+        String sql = "SELECT * FROM `" + entityName + "`";
+        return query(sql, Collections.emptyList(), entityTypeClass);
+    }
+
+    @Override
+    public <EntityType> List<EntityType> findAll(String conditions, List<Object> params, Class<EntityType> entityTypeClass) {
+        String sql = "SELECT * FROM `" + entityName + "` WHERE " + conditions;
+        return query(sql, params, entityTypeClass);
+    }
+
+    @Override
+    public int save(Object object) {
         try {
             Map<String, Object> objectFields = Common.getObjectFields(object);
             List<Object> params = new ArrayList<>(objectFields.values());
@@ -233,16 +270,28 @@ public class EntityManager<T> implements IEntityManager<T> {
     }
 
     @Override
-    public boolean update(String conditions, Map<String, Object> columnsData) {
-        List<Object> params = new ArrayList<>(columnsData.values());
-        StringBuilder columns = new StringBuilder();
-        StringBuilder sql = new StringBuilder("UPDATE `" + entityName + "` SET ");
+    public boolean update(Object object) {
+        try {
+            Map<String, Object> columnsData = Common.getObjectFields(object);
 
-        columnsData.keySet().forEach(key -> columns.append("`").append(key).append("` = ?,"));
-        columns.delete(columns.length() - 1, columns.length()); // Remove last comma
-        sql.append(columns).append(" ").append(conditions);
+            StringBuilder columns = new StringBuilder();
+            StringBuilder sql = new StringBuilder("UPDATE `" + entityName + "` SET ");
 
-        return execute(sql.toString(), params);
+            columnsData.keySet().forEach(key -> columns.append("`").append(key).append("` = ?,"));
+            columns.delete(columns.length() - 1, columns.length()); // Remove last comma
+            sql.append(columns);
+
+            return execute(sql.toString(), Arrays.asList(columnsData.values().toArray()));
+        } catch (IllegalAccessException e) {
+            log.error("Cannot update entity: {}", object.getClass(), e);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean update(String sql, List<Object> params) {
+        return execute(sql, params);
     }
 
     @Override

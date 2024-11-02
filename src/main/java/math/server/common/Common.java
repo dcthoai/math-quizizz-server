@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+
+import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -39,9 +41,15 @@ public class Common {
 
             if (value != null) {
                 try {
+                    if (value instanceof BigInteger && field.getType() == int.class) {
+                        value = ((BigInteger) value).intValue();
+                    }
+
                     field.set(object, value);
                 } catch (IllegalAccessException e) {
                     log.error("Failed to set value for field: " + field.getName(), e);
+                } catch (IllegalArgumentException e) {
+                    log.error("Type mismatch while setting field: " + field.getName() + " with value: " + value, e);
                 }
             }
         }

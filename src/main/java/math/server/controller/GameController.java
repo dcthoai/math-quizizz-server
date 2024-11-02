@@ -12,7 +12,7 @@ import math.server.model.Question;
 import math.server.model.Room;
 import math.server.router.EndPoint;
 import math.server.router.RouterMapping;
-import math.server.service.GameService;
+import math.server.service.impl.GameService;
 import math.server.service.utils.ScheduledTasksService;
 import math.server.service.utils.SessionManager;
 import math.server.service.utils.UserSession;
