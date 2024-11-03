@@ -23,14 +23,12 @@ public class Room {
     private static final Logger log = LoggerFactory.getLogger(Room.class);
     private final Gson gson = new Gson();
     private final String roomID;
-    private final Map<String, UserSession> users;
-    private Map<String, Integer> ranking;
+    private final Map<String, UserSession> users = new HashMap<>();
+    private Map<String, Integer> ranking = new LinkedHashMap<>();
     private Boolean isPlayingGame = false;
 
     public Room(String roomID) {
         this.roomID = roomID;
-        this.users = new HashMap<>();
-        this.ranking = new LinkedHashMap<>();
         log.info("Created new room: {}", roomID);
     }
 
@@ -65,11 +63,15 @@ public class Room {
     public boolean removeUser(String username) {
         if (Objects.nonNull(username)) {
             users.remove(username);
-            updateRoomData();
 
             if (isEmpty()) {
                 SessionManager.getInstance().removeRoom(roomID);
+            } else {
+                updateRoomData();
             }
+
+            // Notify change list rooms for all online users
+            SessionManager.getInstance().notifyChangeRoomsData();
 
             return true;
         }
@@ -85,13 +87,15 @@ public class Room {
     public static List<RoomDTO> getRoomDTOs(List<Room> rooms) {
         List<RoomDTO> roomDTOS = new ArrayList<>();
 
-        rooms.forEach(room -> {
-            List<UserSession> sessions = new ArrayList<>(room.getUsers().values());
-            List<String> users = sessions.stream().map(UserSession::getUsername).collect(Collectors.toList());
-            RoomDTO roomDTO = new RoomDTO(room.getRoomID(), room.isPlayingGame(), users);
-
-            roomDTOS.add(roomDTO);
-        });
+        try {
+            rooms.forEach(room -> {
+                if (Objects.nonNull(room)) {
+                    roomDTOS.add(getRoomDTO(room));
+                }
+            });
+        } catch (Exception e) {
+            log.error("Cannot convert to room DTOs", e);
+        }
 
         return roomDTOS;
     }

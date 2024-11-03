@@ -5,7 +5,7 @@ import math.server.repository.utils.Entity;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-@Entity(value = "game")
+@Entity(value = "gamehistory")
 @SuppressWarnings("unused")
 public class Game {
 

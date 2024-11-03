@@ -10,7 +10,7 @@ public class GameRepository extends EntityManager<Game> implements IGameReposito
 
     @Override
     public List<Game> findAllByUser(String username) {
-        String sql = "SELECT g.* FROM game g " +
+        String sql = "SELECT g.* FROM `gamehistory` g " +
                      "JOIN player p ON g.ID = p.gameID " +
                      "JOIN user u ON u.ID = p.userID " +
                      "WHERE u.username = ?";
@@ -20,7 +20,7 @@ public class GameRepository extends EntityManager<Game> implements IGameReposito
 
     @Override
     public List<Game> findAllByUser(Integer userID) {
-        String sql = "SELECT g.* FROM game g " +
+        String sql = "SELECT g.* FROM `gamehistory` g " +
                 "JOIN player p ON g.ID = p.gameID " +
                 "WHERE p.userID = ?";
 

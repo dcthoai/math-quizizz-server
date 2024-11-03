@@ -12,8 +12,8 @@ public interface Constants {
     String DATABASE_KEY = "1234";
 
     Integer MAX_CONNECTION = 10;
-    Integer MIN_CONNECTION_IDLE = 4;
-    Long CONNECTION_IDLE_TIMEOUT = 3 * 60 * 1000L; // 3 minutes
+    Integer MIN_CONNECTION_IDLE = 3;
+    Long CONNECTION_IDLE_TIMEOUT = 5 * 60 * 1000L; // 5 minutes
     Long CONNECTION_TIMEOUT = 30 * 1000L; // 30 seconds
     Long CONNECTION_LIFETIME = 10 * 60 * 1000L; // 10 minutes
 
@@ -35,6 +35,10 @@ public interface Constants {
     Integer SOCKET_SENT_DATA_SUCCESS = 2000;
     Integer SOCKET_INVALID_DATA = 4000;
     Integer UNKNOWN_SOCKET_SERVER = 5000;
+
+    Integer FRIENDSHIP_REFUSED = 0;
+    Integer FRIENDSHIP_ACCEPTED = 1;
+    Integer FRIENDSHIP_PENDING = 2;
 
     Integer QUESTION_POINT = 1000;
     Long QUESTION_TIMEOUT = 30 * 1000L; // 30 seconds

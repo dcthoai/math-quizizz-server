@@ -43,8 +43,8 @@ public class SessionManager implements Runnable {
 
     public void notifyChangeRoomsData() {
         // Notify change list rooms for all online users
-        List<Room> rooms = instance.getRooms(false);
-        instance.notifyAll(new BaseResponse("/room/update", Room.getRoomDTOs(rooms)));
+        List<Room> roomList = new ArrayList<>(rooms.values());
+        instance.notifyAll(new BaseResponse("/room/update", Room.getRoomDTOs(roomList)));
     }
 
     public void notifyAll(BaseResponse response) {

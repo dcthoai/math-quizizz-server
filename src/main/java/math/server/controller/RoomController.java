@@ -13,6 +13,7 @@ import math.server.service.utils.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -25,12 +26,12 @@ public class RoomController implements RouterMapping {
     private final SessionManager sessionManager = SessionManager.getInstance();
     private final Gson gson = new Gson();
 
-    @EndPoint()
+    @EndPoint("/all")
     public BaseResponse getRooms(UserSession session, BaseRequest request) {
         List<Room> rooms = sessionManager.getRooms(false);
 
-        if (Objects.isNull(rooms))
-            return new BaseResponse(request.getAction(), Collections.emptyList());
+        if (Objects.isNull(rooms) || rooms.isEmpty())
+            return new BaseResponse(request.getAction(), new ArrayList<>());
 
         return new BaseResponse(request.getAction(), rooms);
     }
@@ -91,11 +92,7 @@ public class RoomController implements RouterMapping {
         Room room = sessionManager.getRoom(session.getCurrentRoom(), false);
 
         if (Objects.nonNull(room)) {
-            boolean isSuccess = room.removeUser(session.getClientID());
-
-            // Notify change list rooms for all online users
-            sessionManager.notifyChangeRoomsData();
-
+            boolean isSuccess = room.removeUser(session.getUsername());
             return new BaseResponse(Constants.SUCCESS, isSuccess, request.getAction());
         }
 
