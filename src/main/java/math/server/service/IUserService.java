@@ -17,4 +17,6 @@ public interface IUserService {
     UserDTO getGameInfo(Integer userID);
 
     void updateGameInfo(Integer userID);
+
+    void updateUser(User user);
 }

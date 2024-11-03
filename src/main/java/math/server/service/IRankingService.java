@@ -14,5 +14,5 @@ public interface IRankingService {
 
     List<RankDTO> getAllUserRanks();
 
-    Integer getUserRank(Integer userID);
+    void updateUserRank(Integer userID);
 }

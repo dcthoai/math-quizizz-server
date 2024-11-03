@@ -1,5 +1,6 @@
 package math.server.service.impl;
 
+import math.server.dto.response.GameHistory;
 import math.server.entity.Game;
 import math.server.entity.Player;
 import math.server.repository.impl.GameRepository;
@@ -60,5 +61,10 @@ public class GameService implements IGameService {
             log.error("Failed to save game history asynchronously", ex);
             return null;
         });
+    }
+
+    @Override
+    public List<GameHistory> getAllUserGameHistories(Integer userID) {
+        return gameRepository.findAllByUser(userID);
     }
 }

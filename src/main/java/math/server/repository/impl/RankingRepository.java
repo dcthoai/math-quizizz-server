@@ -22,7 +22,8 @@ public class RankingRepository extends EntityManager<Rank> implements IRankingRe
     @Override
     public List<RankDTO> getAllRanking() {
         String sql = "SELECT r.id, u.username, r.score, RANK() OVER (ORDER BY r.score DESC) AS `userRank` " +
-                     "FROM `rank` r JOIN `user` u ON r.userID = u.ID";
+                     "FROM `rank` r JOIN `user` u ON r.userID = u.ID " +
+                     "WHERE r.score > 0";
 
         return query(sql, Collections.emptyList(), RankDTO.class);
     }
@@ -30,12 +31,12 @@ public class RankingRepository extends EntityManager<Rank> implements IRankingRe
     @Override
     public RankDTO getRankByUserID(Integer userID) {
         String sql = " SELECT ranked_data.ID, u.username, ranked_data.score, ranked_data.userRank " +
-                " FROM ( " +
-                "    SELECT `ID`, `userID`, `score`, RANK() OVER (ORDER BY `score` DESC) AS `userRank` " +
-                "    FROM `rank` " +
-                " ) AS ranked_data " +
-                " JOIN `user` u ON ranked_data.userID = u.ID " +
-                " WHERE u.ID = ?";
+                     " FROM ( " +
+                     "    SELECT `ID`, `userID`, `score`, RANK() OVER (ORDER BY `score` DESC) AS `userRank` " +
+                     "    FROM `rank` WHERE `score` > 0 " +
+                     " ) AS ranked_data " +
+                     " JOIN `user` u ON ranked_data.userID = u.ID " +
+                     " WHERE u.ID = ?";
 
         List<RankDTO> rankDTOs = query(sql, List.of(userID), RankDTO.class);
 

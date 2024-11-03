@@ -1,12 +1,10 @@
 package math.server.repository;
 
-import math.server.entity.Game;
+import math.server.dto.response.GameHistory;
 
 import java.util.List;
 
 public interface IGameRepository {
 
-    List<Game> findAllByUser(String username);
-
-    List<Game> findAllByUser(Integer userID);
+    List<GameHistory> findAllByUser(Integer userID);
 }

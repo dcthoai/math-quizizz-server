@@ -31,7 +31,7 @@ public class Common {
 
         // Populate the ResultSet map
         for (int i = 1; i <= columnCount; i++) {
-            resultSetMap.put(metaData.getColumnName(i).toLowerCase(), resultSet.getObject(i));
+            resultSetMap.put(metaData.getColumnLabel(i).toLowerCase(), resultSet.getObject(i));
         }
 
         // Map fields to the object
@@ -41,8 +41,11 @@ public class Common {
 
             if (value != null) {
                 try {
-                    if (value instanceof BigInteger && field.getType() == int.class) {
-                        value = ((BigInteger) value).intValue();
+                    if (field.getType() == Integer.class || field.getType() == int.class) {
+                        if (value instanceof BigInteger)
+                            value = ((BigInteger) value).intValue();
+                        else if (value instanceof Long)
+                            value = ((Long) value).intValue();
                     }
 
                     field.set(object, value);

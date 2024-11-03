@@ -6,6 +6,7 @@ import math.server.common.Constants;
 import math.server.common.RandomQuestion;
 import math.server.dto.request.BaseRequest;
 import math.server.dto.response.BaseResponse;
+import math.server.dto.response.GameHistory;
 import math.server.dto.response.GameResult;
 import math.server.dto.response.UserDTO;
 import math.server.model.Question;
@@ -169,5 +170,11 @@ public class GameController implements RouterMapping {
         }
 
         return response;
+    }
+
+    @EndPoint("/histories")
+    public BaseResponse getAllUserGameHistories(UserSession session, BaseRequest request) {
+        List<GameHistory> gameHistories = gameService.getAllUserGameHistories(session.getUserID());
+        return new BaseResponse(request.getAction(), gameHistories);
     }
 }

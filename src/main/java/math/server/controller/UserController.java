@@ -104,6 +104,9 @@ public class UserController implements RouterMapping {
                 session.setLoginState(true);
                 log.info("Login success. Saved user login status information to session");
 
+                // Update latest rank of user
+                rankingService.updateUserRank(account.getID());
+
                 return new BaseResponse(Constants.SUCCESS, true, request.getAction(), "Login successfully!", String.valueOf(account.getID()));
             }
 

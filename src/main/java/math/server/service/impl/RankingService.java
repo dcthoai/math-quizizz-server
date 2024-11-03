@@ -2,15 +2,18 @@ package math.server.service.impl;
 
 import math.server.dto.response.RankDTO;
 import math.server.entity.Rank;
+import math.server.entity.User;
 import math.server.repository.impl.RankingRepository;
 import math.server.service.IRankingService;
 import math.server.service.utils.UserSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class RankingService implements IRankingService {
@@ -62,7 +65,15 @@ public class RankingService implements IRankingService {
     }
 
     @Override
-    public Integer getUserRank(Integer userID) {
-        return rankingRepository.getUserRank(userID);
+    public void updateUserRank(Integer userID) {
+        CompletableFuture.runAsync(() -> {
+            int userRank = rankingRepository.getUserRank(userID);
+            User user = userService.findUserById(userID);
+
+            if (Objects.nonNull(user)) {
+                user.setRank(userRank);
+                userService.updateUser(user);
+            }
+        });
     }
 }

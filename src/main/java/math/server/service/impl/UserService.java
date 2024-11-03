@@ -100,4 +100,9 @@ public class UserService implements IUserService {
             return null;
         });
     }
+
+    @Override
+    public void updateUser(User user) {
+        userRepository.update(user);
+    }
 }
