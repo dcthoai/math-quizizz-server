@@ -3,19 +3,16 @@ package math.server.service.impl;
 import math.server.common.Constants;
 import math.server.dto.request.FriendShipStatusRequest;
 import math.server.dto.response.FriendShipDTO;
+import math.server.dto.response.UserDTO;
 import math.server.entity.FriendShip;
 import math.server.repository.impl.FriendShipRepository;
 import math.server.service.IFriendShipService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Objects;
 
 public class FriendShipService implements IFriendShipService {
 
-    private static final Logger log = LoggerFactory.getLogger(FriendShipService.class);
     private final FriendShipRepository friendShipRepository;
 
     public FriendShipService() {
@@ -51,7 +48,7 @@ public class FriendShipService implements IFriendShipService {
     }
 
     @Override
-    public List<FriendShipDTO> getAllFriend(Integer userID) {
+    public List<UserDTO> getAllFriend(Integer userID) {
         return friendShipRepository.getAllFriend(userID);
     }
 }

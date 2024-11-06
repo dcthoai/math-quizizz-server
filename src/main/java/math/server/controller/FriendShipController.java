@@ -5,17 +5,19 @@ import math.server.common.Constants;
 import math.server.dto.request.BaseRequest;
 import math.server.dto.request.FriendShipStatusRequest;
 import math.server.dto.response.BaseResponse;
-import math.server.dto.response.FriendShipDTO;
+import math.server.dto.response.UserDTO;
 import math.server.entity.FriendShip;
 import math.server.router.EndPoint;
 import math.server.router.RouterMapping;
 import math.server.service.impl.FriendShipService;
+import math.server.service.utils.SessionManager;
 import math.server.service.utils.UserSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 @EndPoint("/api/friendship")
 @SuppressWarnings("unused")
@@ -63,21 +65,31 @@ public class FriendShipController implements RouterMapping {
         }
     }
 
-    @EndPoint("/pending-request")
+    @EndPoint("/pending")
     public BaseResponse getPendingFriendRequest(UserSession userSession, BaseRequest request) {
         List<FriendShip> friendShips = friendShipService.getFriendShipByStatus(userSession.getUserID(), Constants.FRIENDSHIP_PENDING);
         return new BaseResponse(request.getAction(), gson.toJson(friendShips));
     }
 
-    @EndPoint("/pending-refused")
+    @EndPoint("/refused")
     public BaseResponse getRefusedFriendRequest(UserSession userSession, BaseRequest request) {
         List<FriendShip> friendShips = friendShipService.getFriendShipByStatus(userSession.getUserID(), Constants.FRIENDSHIP_REFUSED);
         return new BaseResponse(request.getAction(), gson.toJson(friendShips));
     }
 
-    @EndPoint("/all-friend")
+    @EndPoint("/all")
     public BaseResponse getAllFriend(UserSession userSession, BaseRequest request) {
-        List<FriendShipDTO> friendShipDTOS = friendShipService.getAllFriend(userSession.getUserID());
-        return new BaseResponse(request.getAction(), gson.toJson(friendShipDTOS));
+        List<UserDTO> friends = friendShipService.getAllFriend(userSession.getUserID());
+
+        friends.forEach(friend -> {
+            UserSession session = SessionManager.getInstance().getSession(friend.getUsername(), false);
+
+            if (Objects.nonNull(session))
+                friend.setLoginStatus(session.getLoginState());
+            else
+                friend.setLoginStatus(false);
+        });
+
+        return new BaseResponse(request.getAction(), gson.toJson(friends));
     }
 }

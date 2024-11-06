@@ -1,7 +1,7 @@
 package math.server.repository.impl;
 
 import math.server.common.Constants;
-import math.server.dto.response.FriendShipDTO;
+import math.server.dto.response.UserDTO;
 import math.server.entity.FriendShip;
 import math.server.repository.IFriendShipRepository;
 import math.server.repository.utils.EntityManager;
@@ -23,12 +23,12 @@ public class FriendShipRepository extends EntityManager<FriendShip> implements I
     }
 
     @Override
-    public List<FriendShipDTO> getAllFriend(Integer userID) {
+    public List<UserDTO> getAllFriend(Integer userID) {
         String sql = "SELECT " +
-                     "    f.ID AS ID, " +
-                     "    f.status, " +
-                     "    u1.username AS username, " +
-                     "    u2.username AS friendName " +
+                     "    u2.ID as `ID`, " +
+                     "    u2.username as `username`, " +
+                     "    u2.score as `score`, " +
+                     "    u2.rank AS `rank` " +
                      "FROM friendship f " +
                      "JOIN user u1 ON u1.ID = ? " +
                      "JOIN user u2 ON u2.ID = ( " +
@@ -44,6 +44,6 @@ public class FriendShipRepository extends EntityManager<FriendShip> implements I
         for (int i = 0; i < 5; ++i)
             params.add(userID);
 
-        return query(sql, params, FriendShipDTO.class);
+        return query(sql, params, UserDTO.class);
     }
 }
