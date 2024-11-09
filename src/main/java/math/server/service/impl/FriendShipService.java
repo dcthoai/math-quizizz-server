@@ -2,7 +2,7 @@ package math.server.service.impl;
 
 import math.server.common.Constants;
 import math.server.dto.request.FriendShipStatusRequest;
-import math.server.dto.response.FriendShipDTO;
+import math.server.dto.response.FriendRequestDTO;
 import math.server.dto.response.UserDTO;
 import math.server.entity.FriendShip;
 import math.server.repository.impl.FriendShipRepository;
@@ -43,8 +43,8 @@ public class FriendShipService implements IFriendShipService {
     }
 
     @Override
-    public List<FriendShip> getFriendShipByStatus(Integer userID, Integer status) {
-        return friendShipRepository.getFriendShipByStatus(userID, status);
+    public List<FriendRequestDTO> getPendingFriendRequest(Integer userID) {
+        return friendShipRepository.getFriendRequestByStatus(userID, Constants.FRIENDSHIP_PENDING);
     }
 
     @Override

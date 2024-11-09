@@ -87,13 +87,13 @@ public class SessionManager implements Runnable {
         }
     }
 
-    public UserSession getSession(String userID) {
-        if (sessions.containsKey(userID))
-            return sessions.get(userID);    // If user has a session
+    public UserSession getSession(String clientID) {
+        if (sessions.containsKey(clientID))
+            return sessions.get(clientID);    // If user has a session
 
-        if (Objects.nonNull(userID)) {     // Create new session for this user
-            UserSession userSession = new UserSession(userID);
-            sessions.put(userID, userSession);
+        if (Objects.nonNull(clientID)) {     // Create new session for this user
+            UserSession userSession = new UserSession(clientID);
+            sessions.put(clientID, userSession);
             return userSession;
         }
 

@@ -1,6 +1,7 @@
 package math.server.repository.impl;
 
 import math.server.common.Constants;
+import math.server.dto.response.FriendRequestDTO;
 import math.server.dto.response.UserDTO;
 import math.server.entity.FriendShip;
 import math.server.repository.IFriendShipRepository;
@@ -11,15 +12,15 @@ import java.util.List;
 
 public class FriendShipRepository extends EntityManager<FriendShip> implements IFriendShipRepository {
 
-
-    @Override
-    public List<FriendShip> getFriendShipByStatus(Integer userID, Integer status) {
-        String sql = "SELECT * " +
+    public List<FriendRequestDTO> getFriendRequestByStatus(Integer userID, Integer status) {
+        String sql = "SELECT f.ID as ID, " +
+                     "      f.status as status," +
+                     "      u2.username as userSendRequest " +
                      "FROM `friendship` f " +
                      "JOIN `user` u ON f.friendID = u.ID " +
+                     "JOIN `user` u2 ON f.userID = u2.ID " +
                      "WHERE u.ID = ? AND f.status = ? ";
-
-        return query(sql, List.of(userID, status));
+        return query(sql, List.of(userID, status), FriendRequestDTO.class);
     }
 
     @Override

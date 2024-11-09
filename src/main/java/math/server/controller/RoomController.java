@@ -28,6 +28,7 @@ public class RoomController implements RouterMapping {
 
     @EndPoint("/all")
     public BaseResponse getRooms(UserSession session, BaseRequest request) {
+        log.debug("Socket request to get all rooms. Endpoint: /api/room/all");
         List<Room> rooms = sessionManager.getRooms(false);
 
         if (Objects.isNull(rooms) || rooms.isEmpty())
@@ -38,6 +39,7 @@ public class RoomController implements RouterMapping {
 
     @EndPoint("/available")
     public BaseResponse getAvailableRooms(UserSession session, BaseRequest request) {
+        log.debug("Socket request to get all available rooms. Endpoint: /api/room/available");
         List<Room> rooms = sessionManager.getRooms(true);
 
         if (Objects.isNull(rooms))
@@ -48,6 +50,7 @@ public class RoomController implements RouterMapping {
 
     @EndPoint("/new")
     public BaseResponse createRoom(UserSession session, BaseRequest request) {
+        log.debug("Socket request to create a new room. Endpoint: /api/room/new");
         Room room = sessionManager.getRoom(session.getCurrentRoom(), true);  // Create new room if user has no rooms available
         session.setCurrentRoom(room.getRoomID());
         room.addUserToRoom(session.getUsername(), session);
@@ -60,6 +63,7 @@ public class RoomController implements RouterMapping {
 
     @EndPoint("/find")
     public BaseResponse findRoom(UserSession session, BaseRequest request) {
+        log.debug("Socket request to find a room. Endpoint: /api/room/find");
         Room room = sessionManager.getRoom(request.getRequest(), false);
 
         if (Objects.nonNull(room)) {
@@ -71,6 +75,7 @@ public class RoomController implements RouterMapping {
 
     @EndPoint("/join")
     public BaseResponse joinRoom(UserSession session, BaseRequest request) {
+        log.debug("Socket request to join an exist room. Endpoint: /api/room/join");
         Room room = sessionManager.getRoom(request.getRequest(), false);
 
         if (Objects.nonNull(room)) {
@@ -89,6 +94,7 @@ public class RoomController implements RouterMapping {
 
     @EndPoint("/exit")
     public BaseResponse exitRoom(UserSession session, BaseRequest request) {
+        log.debug("Socket request to exit current room. Endpoint: /api/room/exit");
         Room room = sessionManager.getRoom(session.getCurrentRoom(), false);
 
         if (Objects.nonNull(room)) {

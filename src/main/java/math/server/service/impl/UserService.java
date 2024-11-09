@@ -65,6 +65,7 @@ public class UserService implements IUserService {
         UserDTO userDTO = new UserDTO();
         User user = userRepository.findOne(userID);
 
+        userDTO.setID(userID);
         userDTO.setUsername(user.getUsername());
         userDTO.setLoginStatus(true);
         userDTO.setScore(user.getScore());

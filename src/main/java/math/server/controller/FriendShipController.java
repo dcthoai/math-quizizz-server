@@ -5,8 +5,8 @@ import math.server.common.Constants;
 import math.server.dto.request.BaseRequest;
 import math.server.dto.request.FriendShipStatusRequest;
 import math.server.dto.response.BaseResponse;
+import math.server.dto.response.FriendRequestDTO;
 import math.server.dto.response.UserDTO;
-import math.server.entity.FriendShip;
 import math.server.router.EndPoint;
 import math.server.router.RouterMapping;
 import math.server.service.impl.FriendShipService;
@@ -33,8 +33,14 @@ public class FriendShipController implements RouterMapping {
 
     @EndPoint("/add")
     public BaseResponse friendRequest(UserSession userSession, BaseRequest request) {
+        log.debug("Socket request to send friend request. Endpoint: /api/friendship/add");
+
         try {
             Integer friendID = Integer.parseInt(request.getRequest());
+
+            if (friendID.equals(userSession.getUserID()))
+                return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "Cannot send friend request for yourself");
+
             int recordID = friendShipService.saveFriendShip(userSession.getUserID(), friendID);
 
             if (recordID > 0) {
@@ -50,6 +56,8 @@ public class FriendShipController implements RouterMapping {
 
     @EndPoint("/update")
     public BaseResponse updateFriendShipStatus(UserSession userSession, BaseRequest request) {
+        log.debug("Socket request to update friend request status. Endpoint: /api/friendship/update");
+
         try {
             FriendShipStatusRequest friendShipStatusRequest = gson.fromJson(request.getRequest(), FriendShipStatusRequest.class);
             boolean isSuccess = friendShipService.updateFriendShipStatus(friendShipStatusRequest);
@@ -67,18 +75,14 @@ public class FriendShipController implements RouterMapping {
 
     @EndPoint("/pending")
     public BaseResponse getPendingFriendRequest(UserSession userSession, BaseRequest request) {
-        List<FriendShip> friendShips = friendShipService.getFriendShipByStatus(userSession.getUserID(), Constants.FRIENDSHIP_PENDING);
-        return new BaseResponse(request.getAction(), gson.toJson(friendShips));
-    }
-
-    @EndPoint("/refused")
-    public BaseResponse getRefusedFriendRequest(UserSession userSession, BaseRequest request) {
-        List<FriendShip> friendShips = friendShipService.getFriendShipByStatus(userSession.getUserID(), Constants.FRIENDSHIP_REFUSED);
-        return new BaseResponse(request.getAction(), gson.toJson(friendShips));
+        log.debug("Socket request to get all pending friend request. Endpoint: /api/friendship/pending");
+        List<FriendRequestDTO> friendRequests = friendShipService.getPendingFriendRequest(userSession.getUserID());
+        return new BaseResponse(request.getAction(), gson.toJson(friendRequests));
     }
 
     @EndPoint("/all")
     public BaseResponse getAllFriend(UserSession userSession, BaseRequest request) {
+        log.debug("Socket request to get all friendship. Endpoint: /api/friendship/all");
         List<UserDTO> friends = friendShipService.getAllFriend(userSession.getUserID());
 
         friends.forEach(friend -> {

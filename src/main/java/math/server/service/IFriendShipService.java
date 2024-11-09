@@ -1,8 +1,8 @@
 package math.server.service;
 
 import math.server.dto.request.FriendShipStatusRequest;
+import math.server.dto.response.FriendRequestDTO;
 import math.server.dto.response.UserDTO;
-import math.server.entity.FriendShip;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public interface IFriendShipService {
 
     boolean updateFriendShipStatus(FriendShipStatusRequest request);
 
-    List<FriendShip> getFriendShipByStatus(Integer userID, Integer status);
+    List<FriendRequestDTO> getPendingFriendRequest(Integer userID);
 
     List<UserDTO> getAllFriend(Integer userID);
 }

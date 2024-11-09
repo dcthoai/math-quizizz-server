@@ -44,6 +44,7 @@ public class GameController implements RouterMapping {
 
     @EndPoint("/start")
     public BaseResponse startGame(UserSession session, BaseRequest request) {
+        log.debug("Socket request to start game. Endpoint: /api/game/start");
         Room room = sessionManager.getRoom(session.getCurrentRoom(), false);
 
         if (Objects.isNull(room) || room.isEmpty())
@@ -147,6 +148,7 @@ public class GameController implements RouterMapping {
 
     @EndPoint("/answer")
     public BaseResponse answerQuestion(UserSession session, BaseRequest request) {
+        log.debug("Socket request to answer question of game. Endpoint: /api/game/answer");
         BaseResponse response;
         Room room = sessionManager.getRoom(session.getCurrentRoom(), false);
 
@@ -174,6 +176,7 @@ public class GameController implements RouterMapping {
 
     @EndPoint("/histories")
     public BaseResponse getAllUserGameHistories(UserSession session, BaseRequest request) {
+        log.debug("Socket request to get all user game histories. Endpoint: /api/game/histories");
         List<GameHistory> gameHistories = gameService.getAllUserGameHistories(session.getUserID());
         return new BaseResponse(request.getAction(), gameHistories);
     }

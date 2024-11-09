@@ -37,6 +37,32 @@ public class UserController implements RouterMapping {
         this.userService = new UserService();
         this.rankingService = new RankingService();
     }
+
+    @EndPoint("/find")
+    public BaseResponse findUserByUsername(UserSession session, BaseRequest request) {
+        log.debug("Socket request to find user by username. EndPoint: /api/user/find");
+
+        try {
+            User user = userService.findUserByUsername(request.getRequest());
+
+            if (Objects.nonNull(user)) {
+                UserDTO userDTO = userService.getGameInfo(user.getID());
+                UserSession userSession = SessionManager.getInstance().getSession(user.getUsername(), false);
+
+                if (Objects.nonNull(userSession))
+                    userDTO.setLoginStatus(userSession.getLoginState());
+                else
+                    userDTO.setLoginStatus(false);
+
+                return new BaseResponse(request.getAction(), userDTO);
+            }
+
+            return new BaseResponse(Constants.SUCCESS, false, request.getAction(), "User is not exist");
+        } catch (Exception e) {
+            log.error("Failed to find user with username: {}", request.getRequest(), e);
+            return new BaseResponse(Constants.INTERNAL_SERVER_ERROR, false, request.getAction(), "User not found");
+        }
+    }
     
     @EndPoint("/info")
     public BaseResponse getUserInfo(UserSession session, BaseRequest request) {
@@ -59,7 +85,7 @@ public class UserController implements RouterMapping {
 
     @EndPoint("/register")
     public BaseResponse register(UserSession session, BaseRequest request) {
-        log.debug("Socket request to register new account. EndPoint: /api/user/login");
+        log.debug("Socket request to register new account. EndPoint: /api/user/register");
 
         try {
             Gson gson = new Gson();

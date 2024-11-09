@@ -16,7 +16,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -297,26 +296,6 @@ public class EntityManager<T> implements IEntityManager<T> {
             log.error("Failed to insert data into table {}", entityName, e);
         }
     }
-
-//    @Override
-//    public boolean update(Object object) {
-//        try {
-//            Map<String, Object> columnsData = Common.getObjectFields(object);
-//
-//            StringBuilder columns = new StringBuilder();
-//            StringBuilder sql = new StringBuilder("UPDATE `" + entityName + "` SET ");
-//
-//            columnsData.keySet().forEach(key -> columns.append("`").append(key).append("` = ?,"));
-//            columns.delete(columns.length() - 1, columns.length()); // Remove last comma
-//            sql.append(columns);
-//
-//            return execute(sql.toString(), Arrays.asList(columnsData.values().toArray()));
-//        } catch (IllegalAccessException e) {
-//            log.error("Cannot update entity: {}", object.getClass(), e);
-//        }
-//
-//        return false;
-//    }
 
     @Override
     public boolean update(Object object) {
