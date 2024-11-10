@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,7 +30,7 @@ public class RoomController implements RouterMapping {
     public BaseResponse getRooms(UserSession session, BaseRequest request) {
         log.debug("Socket request to get all rooms. Endpoint: /api/room/all");
         List<Room> rooms = sessionManager.getRooms(false);
-        return new BaseResponse(request.getAction(), rooms);
+        return new BaseResponse(request.getAction(), Room.getRoomDTOs(rooms));
     }
 
     @EndPoint("/available")
@@ -40,7 +39,7 @@ public class RoomController implements RouterMapping {
         List<Room> rooms = sessionManager.getRooms(true);
 
         if (Objects.isNull(rooms))
-            return new BaseResponse(request.getAction(), Collections.emptyList());
+            return new BaseResponse(request.getAction(), new ArrayList<>());
 
         return new BaseResponse(request.getAction(), Room.getRoomDTOs(rooms));
     }
