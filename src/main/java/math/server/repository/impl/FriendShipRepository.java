@@ -12,6 +12,18 @@ import java.util.List;
 
 public class FriendShipRepository extends EntityManager<FriendShip> implements IFriendShipRepository {
 
+    @Override
+    public boolean checkFriendShipRequest(Integer userID, Integer friendID) {
+        String sql = "SELECT COUNT(*) AS record_count " +
+                     "FROM `friendShip` f " +
+                     "WHERE (f.userID = ? AND f.friendID = ?) " +
+                     "   OR (f.userID = ? AND f.friendID = ?) ";
+
+        long rows = count(sql, List.of(userID, friendID, friendID, userID));
+
+        return rows > 0;
+    }
+
     public List<FriendRequestDTO> getFriendRequestByStatus(Integer userID, Integer status) {
         String sql = "SELECT f.ID as ID, " +
                      "      f.status as status," +

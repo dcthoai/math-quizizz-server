@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface IFriendShipRepository {
 
+    boolean checkFriendShipRequest(Integer userID, Integer friendID);
+
     List<FriendRequestDTO> getFriendRequestByStatus(Integer userID, Integer status);
 
     List<UserDTO> getAllFriend(Integer userID);

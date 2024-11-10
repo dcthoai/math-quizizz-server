@@ -31,6 +31,11 @@ public class FriendShipService implements IFriendShipService {
     }
 
     @Override
+    public boolean checkFriendShipRequest(Integer userID, Integer friendID) {
+        return friendShipRepository.checkFriendShipRequest(userID, friendID);
+    }
+
+    @Override
     public boolean updateFriendShipStatus(FriendShipStatusRequest request) {
         FriendShip friendShip = friendShipRepository.findOne(request.getID());
 

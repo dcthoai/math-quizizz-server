@@ -10,6 +10,8 @@ public interface IFriendShipService {
 
     int saveFriendShip(Integer userID, Integer friendID);
 
+    boolean checkFriendShipRequest(Integer userID, Integer friendID);
+
     boolean updateFriendShipStatus(FriendShipStatusRequest request);
 
     List<FriendRequestDTO> getPendingFriendRequest(Integer userID);

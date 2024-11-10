@@ -41,6 +41,9 @@ public class FriendShipController implements RouterMapping {
             if (friendID.equals(userSession.getUserID()))
                 return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "Cannot send friend request for yourself");
 
+            if (friendShipService.checkFriendShipRequest(userSession.getUserID(), friendID))
+                return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "This player has sent you a friend request!");
+
             int recordID = friendShipService.saveFriendShip(userSession.getUserID(), friendID);
 
             if (recordID > 0) {
