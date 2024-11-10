@@ -50,6 +50,9 @@ public class GameController implements RouterMapping {
         if (Objects.isNull(room) || room.isEmpty())
             return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "Not found room or empty room");
 
+        if (room.getUsers().size() < Constants.GAME_MINIMUM_PLAYER)
+            return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "You need at least 2 players to start");
+
         // Notify start game for all users in room
         room.setPlayingGame(true);
         room.notifyAll(gson.toJson(new BaseResponse(request.getAction(), Constants.GAME_TIMEOUT)));
@@ -135,10 +138,12 @@ public class GameController implements RouterMapping {
         try {
             Question question = correctAnswers.get(questionKey);
 
-            if (RandomQuestion.containsOnlyOriginalNumbers(question.getQuestion(), answer)) {
-                int result = RandomQuestion.evaluateExpression(answer);
-                return Objects.equals(question.getAnswer(), String.valueOf(result));
-            }
+            if (!RandomQuestion.isValidAnswer(question.getQuestion(), answer))
+                return false;
+
+            int result = RandomQuestion.evaluateExpression(answer);
+
+            return Objects.equals(question.getAnswer(), String.valueOf(result));
         } catch (Exception e) {
             log.error("Cannot check answer", e);
         }

@@ -29,7 +29,7 @@ public class SessionManager implements Runnable {
     private static final Map<String, Room> rooms = new HashMap<>();
     private static final Map<String, UserSession> sessions = new HashMap<>();
     private static final SessionManager instance = new SessionManager();
-    private static final Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     private SessionManager() {}
 

@@ -3,11 +3,9 @@ package math.server.common;
 import math.server.model.Question;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class RandomQuestion {
 
@@ -99,12 +97,15 @@ public class RandomQuestion {
         throw new RuntimeException("Not found operator");
     }
 
-    public static boolean containsOnlyOriginalNumbers(String original, String toCheck) {
-        Set<Integer> originalNumbers = extractNumbers(original);
-        Set<Integer> numbersToCheck = extractNumbers(toCheck);
+    public static boolean isValidAnswer(String original, String answer) {
+        Map<Character, Integer> originalCount = getCountMap(original);
+        Map<Character, Integer> answerCount = getCountMap(answer);
 
-        for (Integer number : numbersToCheck) {
-            if (!originalNumbers.contains(number)) {
+        for (Map.Entry<Character, Integer> entry : answerCount.entrySet()) {
+            char number = entry.getKey();
+            int count = entry.getValue();
+
+            if (!originalCount.containsKey(number) || count > originalCount.get(number)) {
                 return false;
             }
         }
@@ -112,15 +113,15 @@ public class RandomQuestion {
         return true;
     }
 
-    private static Set<Integer> extractNumbers(String input) {
-        Set<Integer> numbers = new HashSet<>();
-        Pattern pattern = Pattern.compile("\\d+");
-        Matcher matcher = pattern.matcher(input);
+    private static Map<Character, Integer> getCountMap(String input) {
+        Map<Character, Integer> countMap = new HashMap<>();
 
-        while (matcher.find()) {
-            numbers.add(Integer.parseInt(matcher.group()));
+        for (char character : input.toCharArray()) {
+            if (Character.isDigit(character)) {
+                countMap.put(character, countMap.getOrDefault(character, 0) + 1);
+            }
         }
 
-        return numbers;
+        return countMap;
     }
 }

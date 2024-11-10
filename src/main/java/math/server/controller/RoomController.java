@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import math.server.common.Constants;
 import math.server.dto.request.BaseRequest;
 import math.server.dto.response.BaseResponse;
+import math.server.dto.response.GameInvitation;
 import math.server.model.Room;
 import math.server.router.EndPoint;
 import math.server.router.RouterMapping;
@@ -30,10 +31,6 @@ public class RoomController implements RouterMapping {
     public BaseResponse getRooms(UserSession session, BaseRequest request) {
         log.debug("Socket request to get all rooms. Endpoint: /api/room/all");
         List<Room> rooms = sessionManager.getRooms(false);
-
-        if (Objects.isNull(rooms) || rooms.isEmpty())
-            return new BaseResponse(request.getAction(), new ArrayList<>());
-
         return new BaseResponse(request.getAction(), rooms);
     }
 
@@ -71,6 +68,28 @@ public class RoomController implements RouterMapping {
         }
 
         return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "Not found room with ID: " + request.getRequest());
+    }
+
+    @EndPoint("/invite")
+    public BaseResponse inviteToRoom(UserSession session, BaseRequest request) {
+        log.debug("Socket request to invite player to current room. EndPoint: /api/room/invite");
+        Room room = sessionManager.getRoom(session.getCurrentRoom(), true);
+
+        String receiverName = request.getRequest();
+        UserSession receiverSession = sessionManager.getSession(receiverName, false);
+
+        if (Objects.nonNull(receiverSession) && receiverSession.getLoginState()) {
+            GameInvitation gameInvitation = new GameInvitation();
+            gameInvitation.setInviter(session.getUsername());
+            gameInvitation.setRoomID(room.getRoomID());
+
+            BaseResponse response = new BaseResponse("/room/invite", gameInvitation);
+            receiverSession.notify(gson.toJson(response));  // Notify for receiver to join room
+
+            return new BaseResponse(request.getAction(), Constants.NO_CONTENT);
+        }
+
+        return new BaseResponse(Constants.SUCCESS, false, request.getAction(), "Invalid friend info or Your friend is offline");
     }
 
     @EndPoint("/join")

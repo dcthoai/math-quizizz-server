@@ -112,7 +112,7 @@ public class Room {
     }
 
     public boolean isFull() {
-        return users.size() > 5;
+        return users.size() >= Constants.ROOM_SIZE;
     }
 
     public void updateUserPoint(String username) {

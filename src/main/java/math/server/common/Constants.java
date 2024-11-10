@@ -40,9 +40,12 @@ public interface Constants {
     Integer FRIENDSHIP_ACCEPTED = 1;
     Integer FRIENDSHIP_PENDING = 2;
 
+    Integer ROOM_SIZE = 5;
+    Integer GAME_MINIMUM_PLAYER = 2;
+
     Integer QUESTION_POINT = 1000;
     Long QUESTION_TIMEOUT = 30 * 1000L; // 30 seconds
-    Long GAME_TIMEOUT = 2 * 30 * 1000L; // 5 minutes equivalent to 10 question
+    Long GAME_TIMEOUT = 5 * 30 * 1000L; // 5 minutes equivalent to 10 question
     String TIMEOUT_TASK = "TIMEOUT_";
     String INTERVAL_TASK = "INTERVAL_";
 
