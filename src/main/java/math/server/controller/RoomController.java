@@ -82,6 +82,9 @@ public class RoomController implements RouterMapping {
             gameInvitation.setInviter(session.getUsername());
             gameInvitation.setRoomID(room.getRoomID());
 
+            session.setCurrentRoom(room.getRoomID());
+            room.addUserToRoom(session.getUsername(), session);
+
             BaseResponse response = new BaseResponse("/room/invite", gameInvitation);
             receiverSession.notify(gson.toJson(response));  // Notify for receiver to join room
 
