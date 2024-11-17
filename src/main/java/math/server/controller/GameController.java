@@ -24,15 +24,15 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 @EndPoint("/api/game")
 @SuppressWarnings("unused")
 public class GameController implements RouterMapping {
 
     private static final Logger log = LoggerFactory.getLogger(GameController.class);
-    private static final Map<String, Question> correctAnswers = new HashMap<>();
+    private static final Map<String, Question> correctAnswers = new ConcurrentHashMap<>();
     private final SessionManager sessionManager = SessionManager.getInstance();
     private final ScheduledTasksService scheduledTasksService = ScheduledTasksService.getInstance();
     private final Gson gson = new Gson();
@@ -62,7 +62,7 @@ public class GameController implements RouterMapping {
         room.getUsers().values().forEach(this::updateUserInfoInGame);
 
         scheduledTasksService.setInterval(() -> playGame(room), Constants.INTERVAL_TASK + room.getRoomID(), Constants.QUESTION_TIMEOUT);
-        scheduledTasksService.setTimeout(() -> finishGame(room.getRoomID()), Constants.TIMEOUT_TASK + room.getRoomID(), Constants.GAME_TIMEOUT);
+        scheduledTasksService.setTimeout(() -> finishGame(room), Constants.TIMEOUT_TASK + room.getRoomID(), Constants.GAME_TIMEOUT);
 
         return null; // Do not send a response message to the client that sent this request if the game start was successful
     }
@@ -76,14 +76,9 @@ public class GameController implements RouterMapping {
         room.notifyAll(gson.toJson(response));
     }
 
-    private void finishGame(String roomID) {
-        scheduledTasksService.shutdownTask(Constants.INTERVAL_TASK + roomID);
-        scheduledTasksService.shutdownTask(Constants.TIMEOUT_TASK + roomID);
-
-        Room room = sessionManager.getRoom(roomID, false);
-
-        if (Objects.isNull(room))
-            return;
+    private void finishGame(Room room) {
+        scheduledTasksService.shutdownTask(Constants.INTERVAL_TASK + room.getRoomID());
+        scheduledTasksService.shutdownTask(Constants.TIMEOUT_TASK + room.getRoomID());
 
         Map<String, UserSession> users = room.getUsers();
         Map<String, Integer> roomRanking = room.getRanking();
@@ -110,7 +105,7 @@ public class GameController implements RouterMapping {
             });
         }
 
-        sessionManager.removeRoom(roomID);
+        sessionManager.removeRoom(room.getRoomID());
     }
 
     private void updateUserInfoInGame(UserSession session) {
@@ -163,7 +158,7 @@ public class GameController implements RouterMapping {
         if (checkAnswer(room.getRoomID(), request.getRequest())) {
             response = new BaseResponse(Constants.SUCCESS, true, request.getAction(), "Correct answer");
 
-            room.updateUserPoint(session.getUsername());
+            room.updateUserPoint(session.getUsername()); // Update user point in this current game
             session.updateCorrectAnswers();
 
             // Update rank for all users in room

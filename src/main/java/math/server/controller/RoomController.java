@@ -49,7 +49,7 @@ public class RoomController implements RouterMapping {
         log.debug("Socket request to create a new room. Endpoint: /api/room/new");
         Room room = sessionManager.getRoom(session.getCurrentRoom(), true);  // Create new room if user has no rooms available
         session.setCurrentRoom(room.getRoomID());
-        room.addUserToRoom(session.getUsername(), session);
+        room.addUserToRoom(session);
 
         // Update list rooms for all online users
         sessionManager.notifyChangeRoomsData();
@@ -82,8 +82,8 @@ public class RoomController implements RouterMapping {
             gameInvitation.setInviter(session.getUsername());
             gameInvitation.setRoomID(room.getRoomID());
 
-            session.setCurrentRoom(room.getRoomID());
-            room.addUserToRoom(session.getUsername(), session);
+            session.setCurrentRoom(room.getRoomID()); // Re update user current room for sender
+            room.addUserToRoom(session);
 
             BaseResponse response = new BaseResponse("/room/invite", gameInvitation);
             receiverSession.notify(gson.toJson(response));  // Notify for receiver to join room
@@ -100,7 +100,7 @@ public class RoomController implements RouterMapping {
         Room room = sessionManager.getRoom(request.getRequest(), false);
 
         if (Objects.nonNull(room)) {
-            boolean isSuccess = room.addUserToRoom(session.getUsername(), session);
+            boolean isSuccess = room.addUserToRoom(session);
 
             if (isSuccess) {
                 session.setCurrentRoom(room.getRoomID());
@@ -119,7 +119,7 @@ public class RoomController implements RouterMapping {
         Room room = sessionManager.getRoom(session.getCurrentRoom(), false);
 
         if (Objects.nonNull(room)) {
-            boolean isSuccess = room.removeUser(session.getUsername());
+            boolean isSuccess = room.removeUser(session);
             return new BaseResponse(Constants.SUCCESS, isSuccess, request.getAction());
         }
 

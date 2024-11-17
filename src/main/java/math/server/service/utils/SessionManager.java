@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -26,8 +26,8 @@ public class SessionManager implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
     private static final Set<String> uniqueIDs = new HashSet<>();
-    private static final Map<String, Room> rooms = new HashMap<>();
-    private static final Map<String, UserSession> sessions = new HashMap<>();
+    private static final Map<String, Room> rooms = new ConcurrentHashMap<>();
+    private static final Map<String, UserSession> sessions = new ConcurrentHashMap<>();
     private static final SessionManager instance = new SessionManager();
     private final Gson gson = new Gson();
 
@@ -59,7 +59,7 @@ public class SessionManager implements Runnable {
     }
 
     public Room getRoom(String roomID, Boolean createRoom) {
-        if (rooms.containsKey(roomID))  // If it has a room valid
+        if (Objects.nonNull(roomID) && rooms.containsKey(roomID))  // If it has a room valid
             return rooms.get(roomID);
 
         if (createRoom) {   // Create new room if required
@@ -116,9 +116,9 @@ public class SessionManager implements Runnable {
         return userSession;
     }
 
-    public void invalidSession(String userID) {
-        sessions.remove(userID);
-        log.info("Invalid session for client: {}", userID);
+    public void invalidSession(String clientID) {
+        sessions.remove(clientID);
+        log.info("Invalid session for client: {}", clientID);
     }
 
     @Override

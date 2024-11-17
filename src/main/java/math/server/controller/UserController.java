@@ -119,7 +119,7 @@ public class UserController implements RouterMapping {
             UserSession userSession = sessionManager.getSession(userRequest.getUsername(), false);
 
             if (Objects.nonNull(userSession) && userSession.getLoginState()) {
-                return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "Account is logged in elsewhere");
+                return new BaseResponse(Constants.BAD_REQUEST, false, request.getAction(), "Account is logged in anywhere");
             }
 
             User account = userService.checkLogin(userRequest);

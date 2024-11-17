@@ -72,10 +72,7 @@ public class ClientHandler implements Runnable {
 
                 BaseRequest request = gson.fromJson(jsonRequest, BaseRequest.class);
 
-                if (Objects.isNull(request.getEndPoint()))
-                    continue;
-
-                if (request.getEndPoint().equals(Constants.SOCKET_CLOSE))
+                if (!Objects.isNull(request.getEndPoint()) && request.getEndPoint().equals(Constants.SOCKET_CLOSE))
                     return;
 
                 // Use router to process request

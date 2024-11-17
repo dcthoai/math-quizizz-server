@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import math.server.common.Constants;
 import math.server.dto.response.BaseResponse;
 import math.server.dto.response.RoomDTO;
+import math.server.entity.User;
 import math.server.service.utils.SessionManager;
 import math.server.service.utils.UserSession;
 
@@ -13,9 +14,9 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class Room {
@@ -23,7 +24,7 @@ public class Room {
     private static final Logger log = LoggerFactory.getLogger(Room.class);
     private final Gson gson = new Gson();
     private final String roomID;
-    private final Map<String, UserSession> users = new HashMap<>();
+    private final Map<String, UserSession> users = new ConcurrentHashMap<>();
     private Map<String, Integer> ranking = new LinkedHashMap<>();
     private Boolean isPlayingGame = false;
 
@@ -40,18 +41,21 @@ public class Room {
         return users;
     }
 
-    public boolean addUserToRoom(String username, UserSession userSession) {
+    public boolean addUserToRoom(UserSession userSession) {
         if (isFull() || isPlayingGame())
             return false;
 
-        if (Objects.nonNull(username) && Objects.nonNull(userSession)) {
+        String username = userSession.getUsername();
+
+        if (Objects.nonNull(username)) {
             users.put(username, userSession);
-            ranking.put(userSession.getUsername(), 0); // Init user rank with current point = 0
+            ranking.put(username, 0); // Init user rank with current point = 0
+
             updateRoomData();
             return true;
         }
 
-        log.error("User ID is null or not found method to execute this user!");
+        log.error("UserSession is null or not found method to execute this user!");
         return false;
     }
 
@@ -60,9 +64,9 @@ public class Room {
         notifyAll(gson.toJson(response));
     }
 
-    public boolean removeUser(String username) {
-        if (Objects.nonNull(username)) {
-            users.remove(username);
+    public boolean removeUser(UserSession userSession) {
+        if (Objects.nonNull(userSession)) {
+            users.remove(userSession.getUsername());
 
             if (isEmpty()) {
                 SessionManager.getInstance().removeRoom(roomID);
@@ -72,7 +76,6 @@ public class Room {
 
             // Notify change list rooms for all online users
             SessionManager.getInstance().notifyChangeRoomsData();
-
             return true;
         }
 
@@ -81,7 +84,11 @@ public class Room {
 
     public void notifyAll(String response) {
         List<UserSession> userSessions = new ArrayList<>(users.values());
-        userSessions.forEach(session -> session.getClientHandler().sendMessage(response));
+
+        userSessions.forEach(session -> {
+            if (Objects.equals(session.getCurrentRoom(), this.getRoomID()))
+                session.notify(response);
+        });
     }
 
     public static List<RoomDTO> getRoomDTOs(List<Room> rooms) {

@@ -53,7 +53,7 @@ public class UserSession {
             Room room = SessionManager.getInstance().getRoom(currentRoom, false);
 
             if (Objects.nonNull(room))
-                room.removeUser(clientID);
+                room.removeUser(this);
         }
 
         resetGameValue();
@@ -66,10 +66,6 @@ public class UserSession {
 
     public void setUserID(Integer userID) {
         this.userID = userID;
-    }
-
-    public String getClientID() {
-        return clientID;
     }
 
     public String getUsername() {
@@ -122,9 +118,5 @@ public class UserSession {
 
     public Integer getCorrectAnswers() {
         return correctAnswers;
-    }
-
-    public void setCorrectAnswers(Integer correctAnswers) {
-        this.correctAnswers = correctAnswers;
     }
 }
