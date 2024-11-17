@@ -18,7 +18,8 @@ public class GameRepository extends EntityManager<Game> implements IGameReposito
                      "FROM `gamehistory` g " +
                      "JOIN `player` p ON g.ID = p.gameID " +
                      "WHERE p.userID = ? " +
-                     "GROUP BY g.time, p.score, p.rank, g.ID";
+                     "GROUP BY g.time, p.score, p.rank, g.ID " +
+                     "ORDER BY g.time DESC";
 
         return query(sql, List.of(userID), GameHistory.class);
     }
